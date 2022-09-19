@@ -1,9 +1,11 @@
 <?php
+use Slim\Psr7\Environment;
+
 class AccesoDatos
 {
     private static $objAccesoDatos;
     private $objetoPDO;
-
+    
     private function __construct()
     {
         try {
@@ -14,6 +16,7 @@ class AccesoDatos
             die();
         }
     }
+
 
     public static function obtenerInstancia()
     {
