@@ -2,6 +2,7 @@
 //require __DIR__ . '/../vendor/autoload.php';
 use Firebase\JWT\JWT;
 
+
 class AutentificadorJWT
 {
     private static $claveSecreta = 'SuperOctavioVillegas666';
@@ -83,4 +84,6 @@ class AutentificadorJWT
         return sha1($aud);
     }
 }
+
+
 ?>

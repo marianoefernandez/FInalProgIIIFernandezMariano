@@ -24,21 +24,24 @@ class Logs
 		$flag=0;
         $listaLogs = Logs::ObtenerLogsLogin();
 		$len = count($listaLogs);
+        $contador = 0;
 
 		if($len>0)
 		{
 			$retorno=("<table>");
-			$retorno.=("<th>[Nombre]</th><th>[Apellido]</th><th>[Email]</th><th>[Tipo]</th><th>[Rol]</th><th>[Hora de Ingreso]</th>");
+			$retorno.=("<th>[Nro Operacion]</th><th>[Nombre]</th><th>[Apellido]</th><th>[Email]</th><th>[Tipo]</th><th>[Rol]</th><th>[Hora de Ingreso]</th>");
 			foreach($listaLogs as $log)
 			{
+                $contador++;
                 $usuario = Usuario::ObtenerUsuario($log->idUsuario);
                 $retorno.=("<tr align='center'>");
-                $retorno.=("<td>[".$usuario->GetNombre()."]</td>");
-                $retorno.=("<td>[".$usuario->GetApellido()."]</td>");
-                $retorno.=("<td>[".$usuario->GetEmail()."]</td>");
-                $retorno.=("<td>[".$usuario->GetTipo()."]</td>");
-                $retorno.=("<td>[".$usuario->GetRol()."]</td>");
-                $retorno.=("<td>[".$log->fechaLogin."]</td>");
+                $retorno.=("<td>".$contador."</td>");
+                $retorno.=("<td>".$usuario->GetNombre()."</td>");
+                $retorno.=("<td>".$usuario->GetApellido()."</td>");
+                $retorno.=("<td>".$usuario->GetEmail()."</td>");
+                $retorno.=("<td>".$usuario->GetTipo()."</td>");
+                $retorno.=("<td>".$usuario->GetRol()."</td>");
+                $retorno.=("<td>".$log->fechaLogin."</td>");
                 $retorno.=("</tr>");
                 $flag=1;
 			}
@@ -90,48 +93,12 @@ class Logs
 		return $retorno;
     }
 
-    public static function RetornarListaDeLogsOperaciones()
-	{
-		$flag=0;
-        $listaLogs = Logs::ObtenerLogsOperaciones();
-		$len = count($listaLogs);
-
-		if($len>0)
-		{
-			$retorno=("<table>");
-			$retorno.=("<th>[Nombre]</th><th>[Apellido]</th><th>[Email]</th><th>[Tipo]</th><th>[Rol]</th><th>[Operacion]</th><th>[Hora de Operacion]</th>");
-			foreach($listaLogs as $log)
-			{
-                $usuario = Usuario::ObtenerUsuario($log->idUsuario);
-                $retorno.=("<tr align='center'>");
-                $retorno.=("<td>[".$usuario->GetNombre()."]</td>");
-                $retorno.=("<td>[".$usuario->GetApellido()."]</td>");
-                $retorno.=("<td>[".$usuario->GetEmail()."]</td>");
-                $retorno.=("<td>[".$usuario->GetTipo()."]</td>");
-                $retorno.=("<td>[".$usuario->GetRol()."]</td>");
-                $retorno.=("<td>[".$log->operacion."]</td>");
-                $retorno.=("<td>[".$log->fechaOperacion."]</td>");
-                $retorno.=("</tr>");
-                $flag=1;
-			}
-			$retorno.=("</table>");
-		}
-
-		if($flag==0)
-		{
-			$retorno="No hay ningun elemento en la lista";
-		}
-
-		return $retorno;
-    }
-
-
     public static function RetornarListaDeLogsOperacionesPorId($idUsuario)
 	{
 		$flag=0;
         $listaLogs = Logs::ObtenerLogsOperacionPorId($idUsuario);
-		$len = count($listaLogs);
         $contador = 0;
+		$len = count($listaLogs);
 
 		if($len>0)
 		{
@@ -142,13 +109,14 @@ class Logs
             $retorno=("<h2>Muestro los logs para el $usuario->rol $usuario->nombre $usuario->apellido</h2>");
 
 			$retorno.=("<table>");
-			$retorno.=("<th>Hora de Operacion</th><th>[Operacion]</th>");
+			$retorno.=("<th>[Nro Operacion]</th><th>[Hora de Operacion]</th><th>[Operacion]</th>");
 			foreach($listaLogs as $log)
 			{
                 $contador++;
                 $retorno.=("<tr align='center'>");
-                $retorno.=("<td> $contador- ".$log->fechaOperacion."</td>");
-                $retorno.=("<td>[".$log->operacion."]</td>");
+                $retorno.=("<td>".$contador."</td>");
+                $retorno.=("<td>".$log->fechaOperacion."</td>");
+                $retorno.=("<td>".$log->operacion."</td>");
                 $retorno.=("</tr>");
                 $flag=1;
 			}
@@ -158,6 +126,106 @@ class Logs
 		if($flag==0)
 		{
 			$retorno="No hay ningun elemento en la lista para ese id";
+		}
+
+		return $retorno;
+    }
+
+    public static function RetornarListaDeLogsOperacionesPorRol($rol)
+	{
+		$flag=0;
+
+        $listaLogs = Logs::ObtenerLogsOperaciones();
+        
+		$len = count($listaLogs);
+        $contador = 0;
+
+		if($len>0)
+		{
+            $retorno=("<h2>Muestro las operaciones de todos los $rol </h2>");
+
+            $retorno.=("<table>");
+			$retorno.=("<th>Nro de Operacion</th><th>Hora de Operacion</th><th>[Operacion]</th>");
+
+            foreach($listaLogs as $log)
+            {
+                $usuario = Usuario::ObtenerUsuario($log->idUsuario);
+
+                if($usuario != false && ($usuario->rol == $rol || $usuario->tipo == $rol))
+                {
+                    $contador++;
+                    $retorno.=("<tr align='center'>");
+                    $retorno.=("<td>".$contador."</td>");
+                    $retorno.=("<td>".$log->fechaOperacion."</td>");
+                    $retorno.=("<td>".$log->operacion."</td>");
+                    $retorno.=("</tr>");
+                    $flag=1;
+                }
+            }
+
+            $retorno.=("</table>");
+		}
+
+		if($flag==0)
+		{
+			$retorno="No hay ningun elemento en la lista para ese rol";
+		}
+
+		return $retorno;
+    }
+
+    public static function RetornarListaDeLogsOperacionesPorRolSeparadaPorUsuario($rol)
+	{
+		$flag=0;
+
+        $rol == "socio" ? $listaUsuarios = Usuario::ObtenerUsuariosPorTipo($rol) :
+        $listaUsuarios = Usuario::ObtenerUsuariosPorRol($rol);
+        
+		$len = count($listaUsuarios);
+
+        $contador = 0;
+        $contadorUsuario = 0;
+
+		if($len>0)
+		{
+            $retorno=("<h2>Muestro las operaciones de todos los $rol por usuario </h2>");
+            
+            foreach($listaUsuarios as $usuario)
+            {
+                $listaLogs = Logs::ObtenerLogsOperacionPorId($usuario->GetID());
+                $len = count($listaLogs);
+
+                if($len > 0)
+                {
+                    $contadorUsuario++;
+
+                    $retorno.=("<h3>$contadorUsuario-$usuario->nombre $usuario->apellido </h3>");
+
+                    $retorno.=("<table>");
+                    $retorno.=("<th>Nro de Operacion</th><th>Hora de Operacion</th><th>[Operacion]</th>");
+                    foreach($listaLogs as $log)
+                    {
+                        $usuario = Usuario::ObtenerUsuario($log->idUsuario);
+        
+                        if($usuario != false && ($usuario->rol == $rol || $usuario->tipo == $rol))
+                        {
+                            $contador++;
+                            $retorno.=("<tr align='center'>");
+                            $retorno.=("<td>".$contador."</td>");
+                            $retorno.=("<td>".$log->fechaOperacion."</td>");
+                            $retorno.=("<td>".$log->operacion."</td>");
+                            $retorno.=("</tr>");
+                            $flag=1;
+                        }
+                    }
+                    $retorno.=("</table>");
+                }
+            }
+		}
+
+		if($flag==0)
+		{
+			$retorno="No hay ningun elemento en la lista para ese rol";
 		}
 
 		return $retorno;

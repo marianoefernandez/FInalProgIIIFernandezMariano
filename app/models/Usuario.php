@@ -359,6 +359,41 @@ class Usuario
 		return $retorno;
 	}
 
+	public static function ValidarEstado($estado)
+	{
+		$retorno = false;
+
+		if(is_string($estado) && isset($estado))
+		{		
+			Usuario::ObtenerEstadoInt(strtolower($estado)) > -2 ? $retorno = $estado :
+			$retorno = false;
+		}
+
+		return $retorno;
+	}
+
+	public static function ObtenerEstadoInt($estado)
+	{
+		switch($estado)
+		{
+			case "activo":
+				return 1;
+			break;
+			
+			case "suspendido":
+				return 0;
+			break;
+			
+			case "eliminado":
+				return -1;
+			break;
+
+			default:
+				return false;
+			break;
+		}
+	}
+
 	public static function ObtenerEstadoString($estado)
 	{
 		switch($estado)
@@ -493,7 +528,7 @@ class Usuario
     public static function ObtenerTodosLosUsuarios()
     {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT nombre,apellido,email,clave,tipo,rol,fechaDeInicioActividades,estado FROM usuarios");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre,apellido,email,clave,tipo,rol,fechaDeInicioActividades,estado FROM usuarios");
         $consulta->execute();
 
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
@@ -527,6 +562,26 @@ class Usuario
 		}
 
         return $retorno;
+    }
+
+	public static function ObtenerUsuariosPorRol($rol)
+    {
+		$objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre,apellido,email,clave,tipo,rol,fechaDeInicioActividades,estado FROM usuarios WHERE rol = :rol");
+        $consulta->bindValue(':rol', $rol, PDO::PARAM_STR);
+		$consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
+    }
+
+	public static function ObtenerUsuariosPorTipo($tipo)
+    {
+		$objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre,apellido,email,clave,tipo,rol,fechaDeInicioActividades,estado FROM usuarios WHERE tipo = :tipo");
+        $consulta->bindValue(':tipo', $tipo, PDO::PARAM_STR);
+		$consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
     }
 
 }

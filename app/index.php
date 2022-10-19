@@ -17,6 +17,7 @@ require __DIR__ . '/controllers/UsuarioController.php';
 require __DIR__ . '/controllers/PedidoController.php';
 require __DIR__ . '/controllers/ProductoController.php';
 require __DIR__ . '/controllers/LogLoginController.php';
+require __DIR__ . '/controllers/LogOperacionesController.php';
 require __DIR__ . './middlewares/MWVerificar.php';
 require_once './db/AccesoDatos.php';
 
@@ -88,13 +89,13 @@ $app->group('/usuarios', function (RouteCollectorProxy $group)
     $group->get('/horariosLogin/{id}',\LogLoginController::class . ':TraerUno');
 
     //7-b Cantidad de operaciones de todos por sector
-    //$group->get('/logOperaciones/{rol}',\LogOperacionesController::class . ':TraerUnoSector');
+    $group->get('/logOperacionesSector/{sector}',\LogOperacionesController::class . ':TraerTodosSector');
 
     //7-c Cantidad de operaciones de todos por sector, listada por cada empleado.
-    //$group->get('/logOperaciones',\PedidoController::class . ':TraerTodos');
+    $group->get('/logOperacionesPorEmpleado/{sector}',\LogOperacionesController::class . ':TraerTodosSectorUsuario');
 
     //7-d Cantidad de operaciones de cada uno por separado.
-    //$group->get('/logOperaciones/{id}',\PedidoController::class . ':TraerUno');
+    $group->get('/logOperacionesId/{id}',\LogOperacionesController::class . ':TraerUno');
 
     //7-e Posibilidad de dar de alta a nuevos, suspenderlos o borrarlos
     $group->post('/crearUsuario',\UsuarioController::class . ':CargarUno');
@@ -125,7 +126,7 @@ $app->group('/productos', function (RouteCollectorProxy $group)
     $group->delete('/borrarUno',\ProductoController::class . ':BorrarUno');
     $group->put('/modificarUno',\ProductoController::class . ':ModificarUno');
 
-});//->add(new MWVerificar("socio","todos"))
+})->add(new MWVerificar("socio","todos"));
 
 //Mesas
 $app->group('/mesas', function (RouteCollectorProxy $group)
@@ -141,23 +142,43 @@ $app->group('/mesas', function (RouteCollectorProxy $group)
         return $response;
     });
 
-    $group->post('/crearMesa',\MesaController::class . ':CargarUno');
-    $group->get('/listarMesas',\MesaController::class . ':TraerTodos');
-    $group->delete('/borrarUna',\ProductoController::class . ':BorrarUno');
-    $group->put('/modificarUna',\ProductoController::class . ':ModificarUno');
-    
+    $group->post('/crearMesa',\MesaController::class . ':CargarUno')->add(new MWVerificar("empleado","mozo"));
+    $group->get('/listarMesas',\MesaController::class . ':TraerTodos')->add(new MWVerificar("empleado","mozo"));
+    $group->get('/listarUna/{codigoMesa}',\MesaController::class . ':TraerUno')->add(new MWVerificar("empleado","mozo"));
+    $group->delete('/borrarUna',\MesaController::class . ':BorrarUno')->add(new MWVerificar("socio","todos"));
+    $group->put('/modificarUna',\MesaController::class . ':ModificarUno')->add(new MWVerificar("empleado","mozo"));
+    $group->put('/cambiarEstado/{codigoMesa}',\MesaController::class . ':CambiarEstadoUno');
 
     //9-a La más usada.
-    //9-b La menos usada
+    $group->get('/masUsada',\MesaController::class . ':TraerMesasMasUsadas')->add(new MWVerificar("socio","todos"));
+
+    //9-b La menos usada.
+    $group->get('/menosUsada',\MesaController::class . ':TraerMesasMenosUsadas')->add(new MWVerificar("socio","todos"));
+
     //9-c La que más facturó.
-    //9-d La que menos facturó
-    //9-e La/s que tuvo la factura con el mayor importe
+    $group->get('/mayorRecaudacion',\MesaController::class . ':TraerMesasQueMasRecaudaron')->add(new MWVerificar("socio","todos"));
+
+    //9-d La que menos facturó.    
+    $group->get('/menorRecaudacion',\MesaController::class . ':TraerMesasQueMenosRecaudaron')->add(new MWVerificar("socio","todos"));
+
+    
+    //9-e La/s que tuvo la factura con el mayor importe.
+    $group->get('/facturaMayor',\MesaController::class . ':TraerMesasConFacturaMayor')->add(new MWVerificar("socio","todos"));
+
     //9-f La/s que tuvo la factura con el menor importe.
+    $group->get('/facturaMenor',\MesaController::class . ':TraerMesasConFacturaMenor')->add(new MWVerificar("socio","todos"));
+
     //9-g Lo que facturó entre dos fechas dadas.
-    //9-h Mejores comentarios
-    //9-i Peores comentarios
-})//->add(new MWVerificar("empleado","mozo"))
-;
+    $group->get('/facturaEntreDosFechas/{codigoMesa}',\MesaController::class . ':TraerRecaudacionEntreFechas')->add(new MWVerificar("socio","todos"));
+
+    
+    //9-h Mejores comentarios.
+    $group->get('/mejoresComentarios/{codigoMesa}',\MesaController::class . ':TraerMejoresComentarios')->add(new MWVerificar("socio","todos"));
+
+    //9-i Peores comentarios.
+    $group->get('/peoresComentarios/{codigoMesa}',\MesaController::class . ':TraerPeoresComentarios')->add(new MWVerificar("socio","todos"));
+
+});
 
 //Pedidos
 $app->group('/pedidos', function (RouteCollectorProxy $group)
@@ -173,12 +194,12 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
         return $response;
     });
 
-    $group->post('/crearPedido',\PedidoController::class . ':CargarUno');
+    $group->post('/crearPedido',\PedidoController::class . ':CrearUno')->add(new MWVerificar("empleado","mozo"));
+    $group->post('/cargarPedido/{id}',\PedidoController::class . ':CargarUno')->add(new MWVerificar("empleado","mozo"));
+    $group->post('/subirFoto/{codigoPedido}',\PedidoController::class . ':SubirFoto')->add(new MWVerificar("empleado","mozo"));
     $group->get('/listarPedidos',\PedidoController::class . ':TraerTodos');
     $group->delete('/borrarUno',\ProductoController::class . ':BorrarUno');
     $group->put('/modificarUno',\ProductoController::class . ':ModificarUno');
-
-    //Pedidos
 
     //8-a Lo que más se vendió.
     $group->post('/masVendidos',\PedidoController::class . ':CargarUno');

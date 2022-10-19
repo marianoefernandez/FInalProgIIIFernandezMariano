@@ -21,31 +21,14 @@ class Pedido
 {
 	//ATRIBUTOS
 
-	public $id;
+	public $codigo;//Codigo de pedido
 	public $codigoMesa;
 	public $idUsuario;
-	public $idProducto;
-	public $idCliente;
-	public $cantidad;
 	public $horaInicio;
 	public $horaFinal;
-	public $codigo;//Codigo de pedido
 	public $estado;//En preparacion - terminado
-	public $foto;
 
 	//GETTERS
-	public function GetID()
-	{
-		$retorno=0;
-
-		if(!(is_null($this->id)))
-		{
-			$retorno=$this->id;
-		}
-
-		return $retorno;
-	}
-
 	public function GetCodigoMesa()
 	{
 		$retorno=0;
@@ -65,42 +48,6 @@ class Pedido
 		if(!(is_null($this->idUsuario)))
 		{
 			$retorno=$this->idUsuario;
-		}
-
-		return $retorno;
-	}
-
-	public function GetIDProducto()
-	{
-		$retorno=0;
-
-		if(!(is_null($this->idProducto)))
-		{
-			$retorno=$this->idProducto;
-		}
-
-		return $retorno;
-	}
-
-	public function GetIDCliente()
-	{
-		$retorno=0;
-
-		if(!(is_null($this->idCliente)))
-		{
-			$retorno=$this->idCliente;
-		}
-
-		return $retorno;
-	}
-
-	public function GetCantidad()
-	{
-		$retorno=0;
-
-		if(!(is_null($this->cantidad)))
-		{
-			$retorno=$this->cantidad;
 		}
 
 		return $retorno;
@@ -154,19 +101,6 @@ class Pedido
 		return $retorno;
 	}
 
-	public function GetFoto()
-	{
-		$retorno="";
-
-		if(!(is_null($this->foto)))
-		{
-			$retorno=$this->foto;
-		}
-
-		return $retorno;
-	}
-
-
     //SETTERS
 
 	public function SetCodigoMesa($value)
@@ -177,21 +111,6 @@ class Pedido
 	public function SetIDUsuario($value)
 	{
         $this->idUsuario=$value;
-	}
-
-	public function SetIDProducto($value)
-	{
-        $this->idProducto=$value;
-	}
-
-	public function SetIDCliente($value)
-	{
-        $this->idCliente=$value;
-	}
-
-    public function SetCantidad($value)
-	{
-        $this->cantidad=$value;
 	}
 
 	public function SetHoraInicio($value)
@@ -214,11 +133,6 @@ class Pedido
         $this->estado=$value;	
 	}
 
-	public function SetFoto($value)
-	{
-        $this->foto=$value;	
-	}
-
 	//CONSTRUCTOR
 
 	function __construct()
@@ -226,14 +140,11 @@ class Pedido
 
 	}
 
-	public static function ConstruirPedido($codigoMesa,$idUsuario,$idProducto,$idCliente,$cantidad,$horaInicio,$horaFinal,$foto)
+	public static function ConstruirPedido($codigoMesa,$idUsuario,$horaInicio,$horaFinal)
 	{
 		$pedido=new Pedido();
 		$pedido->SetCodigoMesa($codigoMesa);
 		$pedido->SetIDUsuario($idUsuario);
-		$pedido->SetIDProducto($idProducto);
-		$pedido->SetIDCliente($idCliente);
-		$pedido->SetCantidad($cantidad);
 		$pedido->SetHoraInicio($horaInicio);
 		$pedido->SetHoraFinal($horaFinal);
 
@@ -245,7 +156,6 @@ class Pedido
 
 		$pedido->SetCodigo($codigo);
 		$pedido->SetEstado(PENDIENTE);
-		$pedido->SetFoto($foto);
 
 		return $pedido;
 	}
@@ -255,13 +165,11 @@ class Pedido
 	{
 		$retorno=-1;
 		$mesa = Mesa::ObtenerMesa($pedido->GetCodigoMesa());
-		$producto = Producto::ObtenerProducto($pedido->GetIDProducto());
 		$usuario = Usuario::ObtenerUsuario($pedido->GetIDUsuario());
-
-		if(!(is_null($pedido->GetCantidad()) || is_null($pedido->GetHoraFinal()) || is_null($pedido->GetHoraInicio()) || is_null($pedido->GetCodigo()) || is_null($pedido->GetEstado())))
+		if(!(is_null($pedido->GetHoraFinal()) || is_null($pedido->GetHoraInicio()) || is_null($pedido->GetCodigo()) || is_null($pedido->GetEstado())))
 		{
 			$retorno=0;//Si no está dada de alta la mesa, el producto o el usuario.
-			if($mesa != false && $producto != false && $usuario != false)
+			if($mesa != false && $usuario != false)
 			{
 				$retorno=1;
 				$pedido->AgregarPedidoDatabase();
@@ -271,47 +179,142 @@ class Pedido
 		return $retorno;
 	}
 
+	public static function CargarPedido($codigoPedido,$idProducto,$cantidad)
+	{
+		$retorno = -1;
+		$pedido = Pedido::ObtenerPedido($codigoPedido);
+		$producto = Producto::ObtenerProducto($idProducto);
 
+		if($pedido != false)
+		{
+			$retorno = 0;
+			if($producto != false)
+			{
+				$precio = $producto->GetPrecio() * $cantidad;
+				$pedido->CargarPedidoDatabase($idProducto,$cantidad,$precio);
+				$retorno = 1;
+			}
+		}
+
+		return $retorno;
+	}
+
+
+	public static function SacarFoto($codigoPedido,$foto)
+	{
+		$retorno = -1;
+		$pedido = Pedido::ObtenerPedido($codigoPedido);
+		if($pedido != false && isset($foto) && $foto != "")
+		{
+			$extension=(explode('/', $_FILES["foto"]["type"]));
+			if($extension[0] == "image")
+			{
+				$nombreArchivo=$pedido->GetCodigo();
+				$destino = "ImagenesPedidos/" . $pedido->GetCodigoMesa() . "/";
+				$retorno = $pedido->SubirFotos($_FILES["foto"]["tmp_name"], $destino,$nombreArchivo,$extension[1]);
+			}
+		}
+
+		return $retorno;
+	}
 	
-		public static function CrearCodigoAlfaNumerico()
+	public static function CrearCodigoAlfaNumerico()
+	{
+		$codigoAlfanumerico="";
+		$numeroOLetra=random_int(0,2);//0 Numero, 1 letra
+
+		for ($i=0;$i<5;$i++)
 		{
-			$codigoAlfanumerico="";
-			$numeroOLetra=random_int(0,2);//0 Numero, 1 letra
-
-			for ($i=0;$i<5;$i++)
+			if($numeroOLetra==0)
 			{
-				if($numeroOLetra==0)
-				{
-					$codigoAlfanumerico .= chr(random_int(48,58));
-				}
-				else
-				{
-					$codigoAlfanumerico .= chr(random_int(65,91));
-				}
-
-				$numeroOLetra=random_int(0,2);
+				$codigoAlfanumerico .= chr(random_int(48,57));
+			}
+			else
+			{
+				$codigoAlfanumerico .= chr(random_int(65,90));
 			}
 
-			return$codigoAlfanumerico;
+			$numeroOLetra=random_int(0,2);
 		}
 
-		public static function ValidarAlfaNumerico($alfaNumerico)
+		return$codigoAlfanumerico;
+	}
+
+	public static function ValidarAlfaNumerico($alfaNumerico)
+	{
+		$retorno=false;
+
+		$lista = Pedido::ObtenerTodosLosPedidos();
+
+		foreach ($lista as $pedido) 
 		{
-			$retorno=false;
-
-			$lista = Pedido::ObtenerTodosLosPedidos();
-
-			foreach ($lista as $pedido) 
+			if($pedido->GetCodigo() == $alfaNumerico)
 			{
-				if($pedido->GetCodigo() == $alfaNumerico)
+				$retorno=true;
+				break;
+			}
+		}
+
+		return $retorno;
+	}
+
+	public static function ObtenerMayorRecaudacion()
+	{
+		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
+		$maximo = false;
+
+		foreach ($listaPedidos as $pedido) 
+		{
+			$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->codigo)[0];
+
+			if($recaudacion > $maximo || $maximo == false)
+			{
+				$maximo = $recaudacion;
+			}
+		}
+
+		return $maximo;
+	}
+
+	public static function ObtenerMenorRecaudacion()
+	{
+		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
+		$minimo = false;
+
+		foreach ($listaPedidos as $pedido) 
+		{
+			$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->codigo)[0];
+
+			if($recaudacion < $minimo || $minimo == false)
+			{
+				$minimo = $recaudacion;
+			}
+		}
+
+		return $minimo;
+	}
+
+	public static function RetornarPedidosPorRecaudacion($recaudacion)
+	{
+		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
+		$pedidos = false;
+
+		if(isset($recaudacion) && is_numeric($recaudacion))
+		{
+			$pedidos = array();
+			foreach ($listaPedidos as $pedido) 
+			{
+				$totalRecaudadoPedido = Pedido::ObtenerValorTotalPedido($pedido->codigo)[0];
+	
+				if($totalRecaudadoPedido == $recaudacion)
 				{
-					$retorno=true;
-					break;
+					array_push($pedidos,$pedido);
 				}
 			}
-
-			return $retorno;
 		}
+
+		return $pedidos;
+	}
 
 	function Equals($pedido)
 	{
@@ -326,11 +329,25 @@ class Pedido
 		}
 	
 		$destino .= $nombreArchivo . "." . $extension;
-
-		$this->archivoFoto=$destino;
 	
 		move_uploaded_file($origen,$destino);
 	}
+
+	function SubirFotos($origen,$destino,$nombreArchivo,$extension)
+	{
+		$retorno = 0;
+		$ubicacionFinal = $destino . $nombreArchivo . "." . $extension;
+
+		if (!file_exists($ubicacionFinal)) 
+		{
+			$this->SubirArchivo($origen,$destino,$nombreArchivo,$extension);
+			$this->GuardarFoto($origen,$destino);
+			$retorno = 1;
+		}
+
+		return $retorno;
+	}
+
 
 	public static function RetornarListaDePedidosString($listaPedidos,$listaUsuarios,$listaMesas,$listaProductos,$estado)
 	{
@@ -367,6 +384,22 @@ class Pedido
 		return $retorno;
     }
 
+	/*public function AcumularRecaudacionPedidos()
+	{
+		$listaPedidosProductos = Pedido::ObtenerTodosPedidosProductos();
+		$acumulador = 0;
+
+		foreach ($listaPedidos as $pedido) 
+		{
+			if($pedido->codigoMesa == $this->codigo && $pedido->estado == 1)
+			{
+				$acumulador += 
+			}
+		}
+
+		return $contador;
+	}*/
+
 	public function CalcularTiempoDePreparacion()
 	{
 		return $this->GetHoraFinal()->getTimestamp()-$this->GetHoraInicio()->getTimestamp();
@@ -384,7 +417,29 @@ class Pedido
     public function AgregarPedidoDatabase()
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
-       $consulta = $objetoAccesoDato->prepararConsulta("INSERT into pedidos (codigoMesa,idUsuario,idProducto,idCliente,cantidad,horaInicio,horaFinal,estado,codigo,foto)values('$this->codigoMesa','$this->idUsuario','$this->idProducto','$this->idCliente','$this->cantidad','$this->horaInicio','$this->horaFinal','$this->estado','$this->codigo','$this->foto')");
+       $consulta = $objetoAccesoDato->prepararConsulta("INSERT into pedidos (codigoMesa,idUsuario,horaInicio,horaFinal,estado,codigo)values('$this->codigoMesa','$this->idUsuario','$this->horaInicio','$this->horaFinal','$this->estado','$this->codigo')");
+       $consulta->execute();
+    }
+
+	public function GuardarFoto($origen,$destino)
+	{	
+		$this->BorrarFoto();
+		$objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+		$consulta = $objetoAccesoDato->prepararConsulta("INSERT into fotospedidos (codigoPedido,origen,destino)values('$this->codigo','$origen','$destino')");
+		$consulta->execute();
+	}
+
+	public function BorrarFoto()
+	{	
+		$objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+		$consulta = $objetoAccesoDato->prepararConsulta("DELETE FROM fotospedidos WHERE codigoPedido = '$this->codigo'");
+		$consulta->execute();
+	}
+
+    public function CargarPedidoDatabase($idProducto,$cantidad,$precio)
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+       $consulta = $objetoAccesoDato->prepararConsulta("INSERT into pedprod (codigoPedido,idProducto,cantidad,horaInicio,horaFinal,estado,precio)values('$this->codigo','$idProducto','$cantidad',NULL,NULL,-1,'$precio')");
        $consulta->execute();
     }
 
@@ -399,11 +454,25 @@ class Pedido
     {
 		$retorno=array();
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,idProducto,idCliente,cantidad,horaInicio,horaFinal,codigo,estado,foto FROM pedidos");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos");
 
 		if($consulta->execute())
 		{
 			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+		}
+
+        return $retorno;
+    }
+
+	public static function ObtenerValorTotalPedido($codigoPedido)
+    {
+		$retorno=false;
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT SUM(precio) FROM pedprod WHERE codigoPedido = '$codigoPedido';");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetch(PDO::FETCH_NUM);
 		}
 
         return $retorno;
@@ -414,7 +483,7 @@ class Pedido
 		$retorno=false;
 
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,idProducto,idCliente,cantidad,horaInicio,horaFinal,codigo,estado,foto FROM pedidos WHERE codigo = :codigo");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE codigo = :codigo");
         $consulta->bindValue(':codigo', $codigo, PDO::PARAM_STR);
         
 		if($consulta->execute())
@@ -424,7 +493,6 @@ class Pedido
 
         return $retorno;
     }
-
 
 	//Me permite saber si el pedido termino y establece su estado como terminado
 	public static function VerificarTiempoPedidos()

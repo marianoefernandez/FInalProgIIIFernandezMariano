@@ -28,9 +28,21 @@ class MWVerificar
             AutentificadorJWT::VerificarToken($token);
             $datosToken = AutentificadorJWT::ObtenerData($token);
 
-            $response = $handler->handle($request);
-            $response->withStatus(200);
-            $response->getbody()->write("<br> Usuario logueado: $datosToken->nombre $datosToken->apellido<br> Tipo: $datosToken->tipo <br> Rol: $datosToken->rol");
+            if($datosToken->tipo == $this->tipo || $datosToken->tipo == "socio")
+            {
+                if($datosToken->tipo != "socio" && $datosToken->rol != $this->rol)
+                {
+                    throw new Exception("Acceso denegado, necesita ser un empleado de tipo $this->rol y usted es $datosToken->rol");
+                }
+
+                $response = $handler->handle($request);
+                $response->withStatus(200);
+                $response->getbody()->write("<br> Usuario logueado: $datosToken->nombre $datosToken->apellido<br> Tipo: $datosToken->tipo <br> Rol: $datosToken->rol");
+            }
+            else
+            {
+                throw new Exception("Acceso denegado, usted necesita ser socio para acceder a está informacion, actualmente es empleado");
+            }
         }
         catch(Exception $e)
         {

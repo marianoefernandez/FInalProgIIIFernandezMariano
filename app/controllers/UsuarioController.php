@@ -30,9 +30,8 @@ class UsuarioController extends Usuario implements IApiUsable
         $tipo = $parametros['tipo'];
         $rol = $parametros['rol'];
         $fechaDeCreacion = $parametros['inicioActividades'];
-        $response->withStatus(401);
         $payload = json_encode(array("mensaje" => "Hubo un error al crear al usuario"));
-
+        $response->withStatus(401);
         
 
         // Creamos el usuario
@@ -41,7 +40,7 @@ class UsuarioController extends Usuario implements IApiUsable
         if(Usuario::AltaUsuario($usuario) == 1)
         {
           $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
-          $usuarioLoguado = $this->TraerUsuarioActual($request,$response,$args);
+          $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
           Logs::AgregarLogOperacion($usuarioLoguado,"dio de alta un nuevo usuario llamado $usuario->nombre $usuario->apellido con email $usuario->email");
         }
         else
@@ -68,7 +67,7 @@ class UsuarioController extends Usuario implements IApiUsable
         if($usuario != false)
         {
             $payload = Usuario::RetornarUnUsuarioString($usuario,ACTIVO);
-            $usuarioLoguado = $this->TraerUsuarioActual($request,$response,$args);
+            $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
             Logs::AgregarLogOperacion($usuarioLoguado,"listo al usuario $usuario->nombre $usuario->apellido con email $usuario->email");
             //$payload = json_encode($usuario);
             $response->withStatus(200);
@@ -85,7 +84,7 @@ class UsuarioController extends Usuario implements IApiUsable
         $lista = Usuario::ObtenerTodosLosUsuarios();
         //$payload = json_encode(array("listaUsuario" => $lista));
         $payload = Usuario::RetornarListaDeUsuariosString($lista,ACTIVO);
-        $usuarioLoguado = $this->TraerUsuarioActual($request,$response,$args);
+        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
         Logs::AgregarLogOperacion($usuarioLoguado,"listo a todos los usuarios activos ");
 
         $response->getBody()->write($payload);
@@ -102,24 +101,25 @@ class UsuarioController extends Usuario implements IApiUsable
         $response->withStatus(401);
 
         $usuario = Usuario::ObtenerUsuario($usuarioId);
-        $usuarioLoguado = $this->TraerUsuarioActual($request,$response,$args);
+        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
 
 
-        if(isset($estado) && $usuario != false)
+        if($usuario != false)
         {
           if($usuarioLoguado->id != $usuarioId)
           {
-            $estadoString = Usuario::ObtenerEstadoString($estado);
+            $estado = Usuario::ValidarEstado($estado); 
 
-            if($estadoString != false)
+            if($estado != false)
             {
-              $payload = json_encode(array("mensaje" => "No se modifico porque el estado ya estaba como " . $estadoString));          
+              $estadoInt = Usuario::ObtenerEstadoInt($estado);
+              $payload = json_encode(array("mensaje" => "No se modifico porque el estado ya estaba como " . $estado));          
             
-              if($usuario->GetEstado() != $estado)
+              if($usuario->GetEstado() != $estadoInt)
               {
-                Usuario::CambiarEstadoUsuario($usuario,$estado);
-                $payload = json_encode(array("mensaje" => "El estado se modifico con exito y paso a ser " . $estadoString));          
-                Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado del usuario $usuario->nombre $usuario->apellido a $estadoString ");
+                Usuario::CambiarEstadoUsuario($usuario,$estadoInt);
+                $payload = json_encode(array("mensaje" => "El estado se modifico con exito y paso a ser " . $estado));          
+                Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado del usuario $usuario->nombre $usuario->apellido a $estado ");
                 $response->withStatus(200);
               }
             }
@@ -167,7 +167,7 @@ class UsuarioController extends Usuario implements IApiUsable
         if(Usuario::ModificarUsuario($usuarioAux,$claveHash) == 1)
         {
           $payload = json_encode(array("mensaje" => "Se modifico correctamente"));
-          $usuarioLoguado = $this->TraerUsuarioActual($request,$response,$args);
+          $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
           Logs::AgregarLogOperacion($usuarioLoguado,"modifico los datos del usuario con id '$usuarioAux->id'");
           $response->withStatus(200);
         }
@@ -190,7 +190,7 @@ class UsuarioController extends Usuario implements IApiUsable
 
         $usuarioId = $args['id'];
 
-        $usuarioLoguado = $this->TraerUsuarioActual($request,$response,$args);
+        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
         $payload =  json_encode(array("mensaje" => "Usted no puede borrarse a si mismo de la base de datos"));
         $response->withStatus(401);
 
@@ -229,15 +229,15 @@ class UsuarioController extends Usuario implements IApiUsable
         if($usuario != false && Usuario::LoguearUsuario($email,$clave) && $usuario->GetEstado() == 1)
         {
 
-          $datos = 
-          [
+          $datos = array
+          (
             "id" => $usuario->GetID(),
             "nombre" => $usuario->GetNombre(),
             "apellido" => $usuario->GetApellido(),
             "email" => $usuario->GetEmail(),
             "tipo" => $usuario->GetTipo(),
             "rol" => $usuario->GetRol()
-          ];
+          );
 
           //var_dump($datos);
 
@@ -257,7 +257,7 @@ class UsuarioController extends Usuario implements IApiUsable
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function TraerUsuarioActual($request, $response, $args)    
+    public static function TraerUsuarioActual($request, $response, $args)    
     {
       $usuario = false;
   
