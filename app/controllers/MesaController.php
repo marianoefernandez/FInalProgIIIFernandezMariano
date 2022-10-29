@@ -215,7 +215,7 @@ class MesaController extends Mesa implements IApiUsable
         {
             $payload = json_encode("La mesa con código $mesa->codigo no facturo nada entre el $fechaInicio hasta el $fechaFinal ");                          
 
-            $facturacion = Mesa::ObtenerFacturacionMesaPorFecha($mesa->codigo,$fechaInicio,$fechaFinal)[0];
+            $facturacion = Mesa::ObtenerFacturacionMesaPorFecha($mesa->GetCodigo(),$fechaInicio,$fechaFinal)[0];
 
             if(isset($facturacion) && is_float($facturacion))
             {
@@ -244,7 +244,7 @@ class MesaController extends Mesa implements IApiUsable
         if($mesa != false)
         {
           $payload = json_encode(array("mensaje" => "No hay ningun comentario que corresponda dicha mesa"));
-          $comentarios = Mesa::ObtenerMejoresOPeoresComentariosPorMesa($mesa->codigo,"MAX");
+          $comentarios = Mesa::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MAX");
 
           if(count($comentarios)>0)
           {
@@ -272,7 +272,7 @@ class MesaController extends Mesa implements IApiUsable
         if($mesa != false)
         {
           $payload = json_encode(array("mensaje" => "No hay ningun comentario que corresponda dicha mesa"));
-          $comentarios = Mesa::ObtenerMejoresOPeoresComentariosPorMesa($mesa->codigo,"MIN");
+          $comentarios = Mesa::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MIN");
 
           if(count($comentarios)>0)
           {
@@ -344,7 +344,7 @@ class MesaController extends Mesa implements IApiUsable
           {
             $payload = json_encode(array("mensaje" => "Sólo un socio puede cerrar la mesa "));          
 
-            if($mesa->GetEstado() > -1 || $usuarioLoguado->tipo == "socio")
+            if($mesa->GetEstado() > -1 || $usuarioLoguado->GetTipo() == "socio")
             {
               Mesa::CambiarEstadoMesa($mesa,$estadoInt);
               $payload = json_encode(array("mensaje" => "El estado de la mesa se modifico con exito y paso a ser " . $estado));          

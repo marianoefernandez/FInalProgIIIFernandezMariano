@@ -106,7 +106,7 @@ class UsuarioController extends Usuario implements IApiUsable
 
         if($usuario != false)
         {
-          if($usuarioLoguado->id != $usuarioId)
+          if($usuarioLoguado->GetID() != $usuarioId)
           {
             $estado = Usuario::ValidarEstado($estado); 
 
@@ -153,7 +153,7 @@ class UsuarioController extends Usuario implements IApiUsable
         $usuarioId = $args['id'];
 
         $usuarioAux = Usuario::CrearUsuario($nombre,$apellido,$email,$clave,$tipo,$rol,NULL);
-        $usuarioAux->id = $usuarioId;
+        $usuarioAux->SetID($usuarioId);
 
         $claveHash = "";
         $payload = json_encode(array("mensaje" => "No existe el usuario que se quiere modificar, id incorrecto"));
@@ -161,7 +161,7 @@ class UsuarioController extends Usuario implements IApiUsable
 
         if($clave != "")
         {
-          $claveHash=password_hash($usuarioAux->clave,PASSWORD_DEFAULT);
+          $claveHash=password_hash($usuarioAux->GetClave(),PASSWORD_DEFAULT);
         }
 
         if(Usuario::ModificarUsuario($usuarioAux,$claveHash) == 1)
@@ -195,7 +195,7 @@ class UsuarioController extends Usuario implements IApiUsable
         $response->withStatus(401);
 
 
-        if($usuarioLoguado->id != $usuarioId)
+        if($usuarioLoguado->GetID() != $usuarioId)
         {
           if(Usuario::BorrarUsuario($usuarioId))
           {

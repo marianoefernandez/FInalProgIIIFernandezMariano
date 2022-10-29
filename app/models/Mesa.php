@@ -193,7 +193,7 @@ class Mesa
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			if($pedido->codigoMesa == $this->codigo && $pedido->estado == 1)
+			if($pedido->GetCodigoMesa() == $this->GetCodigo() && $pedido->GetEstado() == 1)
 			{
 				$contador++;
 			}
@@ -209,9 +209,9 @@ class Mesa
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			if($pedido->codigoMesa == $this->codigo && $pedido->estado == 1)
+			if($pedido->GetCodigoMesa() == $this->GetCodigo() && $pedido->GetEstado() == 1)
 			{
-				$acumulador+= Pedido::ObtenerValorTotalPedido($pedido->codigo)[0];
+				$acumulador+= Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
 			}
 		}
 
@@ -327,7 +327,7 @@ class Mesa
 			$mesas = array();
 			foreach ($listaMesas as $mesa) 
 			{
-				if(Mesa::EncontrarPedido($listaPedidos,$mesa->codigo))
+				if(Mesa::EncontrarPedido($listaPedidos,$mesa->GetCodigo()))
 				{
 					array_push($mesas,$mesa); 
 				}
@@ -343,7 +343,7 @@ class Mesa
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			if($codigoMesa == $pedido->codigoMesa && $pedido->estado == 1)
+			if($codigoMesa == $pedido->GetCodigoMesa() && $pedido->GetEstado() == 1)
 			{
 				$retorno = 1;
 				break;
@@ -417,7 +417,7 @@ class Mesa
 	{
 		return $this->GetCodigo() == $mesa->GetCodigo(); 
 	}
-
+/*
 	public function SubirArchivo($origen,$destino,$nombreArchivo,$extension)
 	{
 		if (!file_exists($destino)) 
@@ -431,7 +431,7 @@ class Mesa
 	
 		move_uploaded_file($origen,$destino);
 	}
-
+*/
  	static function GuardarArchivo($path,$contenido,$modo)
 	{
 		$retorno=0;
@@ -584,7 +584,7 @@ class Mesa
 			$retorno = $consulta->fetchAll(PDO::FETCH_OBJ);
 	   	}
         return $retorno;
-	}
+	}	
 }
 
 ?>

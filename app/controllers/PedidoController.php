@@ -1,5 +1,6 @@
 <?php
 require_once '../app/models/Pedido.php';
+require_once '../app/models/Producto.php';
 require_once '../app/models/Usuario.php';
 require_once '../app/models/Logs.php';
 require_once '../app/interfaces/IApiUsable.php';
@@ -144,6 +145,87 @@ class PedidoController extends Pedido implements IApiUsable
         $listaProductos = Producto::ObtenerTodosLosProductos();
         //$payload = json_encode(array("listaUsuario" => $lista));
         $payload = Pedido::RetornarListaDePedidosString($listaPedidos,$listaUsuarios,$listaMesas,$listaProductos,ENPREPARACION);
+
+        if($payload == false)
+        {
+          $payload = "<h1>No se dio de alta ningun pedido<h1>";
+        }
+
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'text/html');
+    }
+    
+    public function TraerLoQueMasVendio($request, $response, $args)
+    {
+      $payload = "No hay productos dados de alta";
+      $maximo = Producto::ObtenerCantidadVendidosProductoMayor();
+      $productosMasVendidos = Producto::RetornarProductosPorCantidadDeVentas($maximo);
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+
+      if($productosMasVendidos != false && count($productosMasVendidos) > 0)
+      {
+        count($productosMasVendidos) > 1 ? $payload = "Los productos más vendidos fueron <br><br>"
+        : $payload = "El producto más vendido fue <br><br>";
+        $payload .= Producto::RetornarListaDeProductosString($productosMasVendidos);
+        $payload .= "<br>La cantidad vendida fue de $maximo unidades<br>";
+
+        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos más vendidos");
+      }
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');
+    }
+
+    public function TraerLoQueMenosVendio($request, $response, $args)
+    {
+      $payload = "No hay productos dados de alta";
+      $minimo = Producto::ObtenerCantidadVendidosProductoMenor();
+      $productosMenosVendidos = Producto::RetornarProductosPorCantidadDeVentas($minimo);
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+
+      if($productosMenosVendidos != false && count($productosMenosVendidos) > 0)
+      {
+        count($productosMenosVendidos) > 1 ? $payload = "Los productos menos vendidos fueron <br><br>"
+        : $payload = "El producto menos vendido fue <br><br>";
+        $payload .= Producto::RetornarListaDeProductosString($productosMenosVendidos);
+        $payload .= "<br>La cantidad vendida fue de $minimo unidades<br>";
+
+        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos menos vendidos");
+      }
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');
+    }
+    
+    public function TraerLosNoEntregadosATiempo($request, $response, $args)
+    {
+        $listaPedidosNoEntregadosATiempo = Pedido::ObtenerTodosLosPedidosQueNoLlegaronATiempo();
+        $listaUsuarios = Usuario::ObtenerTodosLosUsuarios();
+        $listaMesas = Mesa::ObtenerTodasLasMesas();
+        $payload = Pedido::RetornarListaDePedidosString($listaPedidosNoEntregadosATiempo,$listaUsuarios,$listaMesas,TERMINADO);
+        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+        
+        $payload != false ? Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los pedidos no entregados a tiempo")
+        : $payload = "<h1>No hay ningun pedido que no sea haya entregado a tiempo<h1>";
+
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'text/html');
+    }
+
+    public function TraerLosCancelados($request, $response, $args)
+    {
+        $listaPedidos = Pedido::ObtenerTodosLosPedidos();
+        $listaUsuarios = Usuario::ObtenerTodosLosUsuarios();
+        $listaMesas = Mesa::ObtenerTodasLasMesas();
+        $payload = Pedido::RetornarListaDePedidosString($listaPedidos,$listaUsuarios,$listaMesas,CANCELADO);
+        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+        
+        $payload != false ? Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los pedidos cancelados")
+        : $payload = "<h1>No hay ningun pedido que haya sido cancelado<h1>";
 
         $response->getBody()->write($payload);
         return $response

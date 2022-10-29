@@ -123,7 +123,7 @@ class Producto
         $this->precio=$value;
 	}
 
-	public function SetId($value)
+	public function SetID($value)
 	{
         $this->id=$value;
 	}
@@ -182,6 +182,67 @@ class Producto
 		}
 
 		return $retorno;
+	}
+
+	
+	public static function ObtenerCantidadVendidosProductoMayor()
+	{
+		$listaProductos = Producto::ObtenerTodosLosProductos();
+		
+		$maximo = false;
+
+		foreach ($listaProductos as $producto) 
+		{
+			$contador = $producto->CantidadDeVentas();
+
+			if($contador > $maximo || $maximo == false)
+			{
+				$maximo = $contador;
+			}
+		}
+
+		return $maximo;
+	}
+
+	public static function ObtenerCantidadVendidosProductoMenor()
+	{
+		$listaProductos = Producto::ObtenerTodosLosProductos();
+		
+		$minimo = false;
+
+		foreach ($listaProductos as $producto) 
+		{
+			$contador = $producto->CantidadDeVentas();
+
+			if($contador < $minimo || $minimo == false)
+			{
+				$minimo = $contador;
+			}
+		}
+
+		return $minimo;
+	}
+
+	public static function RetornarProductosPorCantidadDeVentas($cantidad)
+	{
+		$listaProductos = Producto::ObtenerTodosLosProductos();
+		$productos = false;
+
+		if(isset($cantidad) && is_numeric($cantidad))
+		{
+			$productos = array();
+			foreach ($listaProductos as $producto) 
+			{
+				$contador = $producto->CantidadDeVentas();
+
+				if($contador == $cantidad)
+				{
+					array_push($productos,$producto);
+				}
+			}
+		}
+
+		return $productos;
 	}
 
 	public static function DarDeBajaUnProducto($idProducto)
@@ -296,6 +357,8 @@ class Producto
 		return $retorno;
     }
 
+	
+
     //METODOS DATABASE
 
     public function AgregarProductoDatabase()
@@ -346,6 +409,26 @@ class Producto
 		if($consulta->execute())
 		{
 			$retorno = $consulta->fetchObject('Producto');
+		}
+
+        return $retorno;
+    }
+
+	public function CantidadDeVentas()
+    {
+		$retorno=false;
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT SUM(pp.cantidad) FROM pedprod pp INNER JOIN PRODUCTOS p ON p.id = pp.idProducto WHERE p.id = $this->id;");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetch(PDO::FETCH_NUM);
+			$retorno = $retorno[0];
+		}
+
+		if(isset($retorno) == false)
+		{
+			$retorno = 0;
 		}
 
         return $retorno;

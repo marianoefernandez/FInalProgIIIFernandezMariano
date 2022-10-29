@@ -202,17 +202,25 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
     $group->put('/modificarUno',\ProductoController::class . ':ModificarUno');
 
     //8-a Lo que más se vendió.
-    $group->post('/masVendidos',\PedidoController::class . ':CargarUno');
+    $group->get('/masVendidos',\PedidoController::class . ':TraerLoQueMasVendio')->add(new MWVerificar("socio","todos"));
 
     //8-b Lo que menos se vendió.
-    $group->post('/menosVendidos',\PedidoController::class . ':CargarUno');
+    $group->get('/menosVendidos',\PedidoController::class . ':TraerLoQueMenosVendio')->add(new MWVerificar("socio","todos"));
 
     //8-c Los que no se entregaron en el tiempo estipulado
-    $group->post('/noEntregadosATiempo',\PedidoController::class . ':CargarUno');
+    $group->get('/noEntregadosATiempo',\PedidoController::class . ':TraerLosNoEntregadosATiempo')->add(new MWVerificar("socio","todos"));
 
     //8-d Los cancelados.
-    $group->post('/cancelados',\PedidoController::class . ':CargarUno');
+    $group->get('/cancelados',\PedidoController::class . ':TraerLosCancelados')->add(new MWVerificar("socio","todos"));
     
+
+});
+
+
+$app->group('/clientes', function (RouteCollectorProxy $group)
+{
+    $group->post('/darOpinion',\PedidoController::class . ':CrearUno');
+    $group->get('/MostrarInfoPedido',\PedidoController::class . ':CrearUno');
 
 });
 

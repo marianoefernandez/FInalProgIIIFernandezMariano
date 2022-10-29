@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\Date;
 
 require_once "./db/AccesoDatos.php";
 require_once "Archivos.php";
+require_once "Producto.php";
+define('CANCELADO',-2);
 define('PENDIENTE',-1);
 define('ENPREPARACION',0);
 define('TERMINADO',1);
+
 
 
 class Pedido
@@ -265,7 +268,7 @@ class Pedido
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->codigo)[0];
+			$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
 
 			if($recaudacion > $maximo || $maximo == false)
 			{
@@ -283,7 +286,7 @@ class Pedido
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->codigo)[0];
+			$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
 
 			if($recaudacion < $minimo || $minimo == false)
 			{
@@ -304,7 +307,7 @@ class Pedido
 			$pedidos = array();
 			foreach ($listaPedidos as $pedido) 
 			{
-				$totalRecaudadoPedido = Pedido::ObtenerValorTotalPedido($pedido->codigo)[0];
+				$totalRecaudadoPedido = Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
 	
 				if($totalRecaudadoPedido == $recaudacion)
 				{
@@ -348,32 +351,41 @@ class Pedido
 		return $retorno;
 	}
 
-
-	public static function RetornarListaDePedidosString($listaPedidos,$listaUsuarios,$listaMesas,$listaProductos,$estado)
+	public static function RetornarListaDePedidosString($listaPedidos,$listaUsuarios,$listaMesas,$estado)
 	{
 		$flag=0;
 		$len = count($listaPedidos);
-		$retorno="<h1>No se dio de alta ningun pedido<h1>";
+		$retorno=false;
 
 		if($len>0)
 		{
 			$retorno=("<table>");
-			$retorno.=("<th>[Pedido Codigo]</th><th>[Producto]</th><th>[Cantidad]</th><th>[Atendio]</th><th>[Mesa Codigo]</th><th>[Tiempo de Preparación]</th><th>[Tiempo Restante]</th>");
+			$retorno.=("<th>[Pedido Codigo]</th><th>[Atendio]</th><th>[Mesa Codigo]</th><th>[Tiempo de Preparación Aproximado]</th><th>[Tiempo Restante Aproximado]</th>");
 			foreach($listaPedidos as $pedido)
 			{
 				$usuario = Usuario::ObtenerUsuario($pedido->GetIDUsuario());
-				$producto = Producto::ObtenerProducto($pedido->GetIDProducto());
 
-				if($pedido->GetEstado()==$estado && $usuario != false && $producto != false)
+				if($pedido->GetEstado()==$estado && $usuario != false)
 				{
+					
 					$retorno.=("<tr align='center'>");
-					$retorno.=("<td>[".$pedido->GetCodigo()."]</td>");
-					$retorno.=("<td>[".$producto->GetNombre() ."]</td>");
-					$retorno.=("<td>[".$pedido->GetCantidad()."]</td>");
-					$retorno.=("<td>[".$usuario->GetNombre() . " ". $usuario->GetApellido() ."]</td>");
-					$retorno.=("<td>[".$pedido->GetCodigoMesa()."]</td>");
-					$retorno.=("<td>[".$pedido->CalcularTiempoDePreparacion(). " segundos" ."]</td>");
-					$retorno.=("<td>[".$pedido->CalcularTiempoDeRestante()."]</td>");
+					$retorno.=("<td>".$pedido->GetCodigo()."</td>");
+					$retorno.=("<td>".$usuario->GetNombre() . " ". $usuario->GetApellido() ."</td>");
+					$retorno.=("<td>".$pedido->GetCodigoMesa()."</td>");
+					$retorno.=("<td>".$pedido->CalcularTiempoDePreparacion(). " segundos" ."</td>");
+					
+					if($pedido->GetEstado() == CANCELADO)
+					{
+						$tiempoRestante = "El pedido fue cancelado";
+					}
+					else
+					{
+						$pedido->VerificarSiTerminoElPedido() 
+						? $tiempoRestante = "Terminado"
+						: $tiempoRestante = $pedido->CalcularTiempoDeRestante();
+					}
+					
+					$retorno.=("<td>".$tiempoRestante."</td>");
 					$retorno.=("</tr>");
 					$flag=1;
 				}
@@ -381,24 +393,13 @@ class Pedido
 			$retorno.=("</table>");
 		}
 
-		return $retorno;
-    }
-
-	/*public function AcumularRecaudacionPedidos()
-	{
-		$listaPedidosProductos = Pedido::ObtenerTodosPedidosProductos();
-		$acumulador = 0;
-
-		foreach ($listaPedidos as $pedido) 
+		if($flag == 0)
 		{
-			if($pedido->codigoMesa == $this->codigo && $pedido->estado == 1)
-			{
-				$acumulador += 
-			}
+			$retorno = false;
 		}
 
-		return $contador;
-	}*/
+		return $retorno;
+    }
 
 	public function CalcularTiempoDePreparacion()
 	{
@@ -409,7 +410,29 @@ class Pedido
 	{
 		$horaActual = new DateTime(date("Y-m-j H:i:s"));
 
-		return $this->GetHoraFinal()->getTimestamp() - $horaActual->getTimestamp() > 0 ? $this->GetHoraFinal()->getTimestamp() - $horaActual->getTimestamp() . " segundos" : "Terminado";
+		return $this->GetHoraFinal()->getTimestamp() - $horaActual->getTimestamp() > 0 ? $this->GetHoraFinal()->getTimestamp() - $horaActual->getTimestamp() . " segundos" : "Aguarde un momento el pedido está tardando más de lo estimado";
+	}
+
+	public function VerificarSiTerminoElPedido()
+	{
+		$listaEstados = $this->ObtenerEstadosDelPedido();
+
+		if(count($listaEstados)> 0 && $listaEstados != false)
+		{
+			foreach ($listaEstados as $estado) 
+			{
+				if($estado->estado != TERMINADO)
+				{
+					return false;
+				}
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		return true;
 	}
 
     //METODOS DATABASE
@@ -464,6 +487,20 @@ class Pedido
         return $retorno;
     }
 
+	public static function ObtenerTodosLosPedidosQueNoLlegaronATiempo()
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE codigo IN (SELECT DISTINCT p.codigo FROM pedidos p INNER JOIN pedprod pp ON pp.codigoPedido = p.codigo AND pp.horaFinal > p.horaFinal);");
+		
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+		}
+
+        return $retorno;
+    }
+
 	public static function ObtenerValorTotalPedido($codigoPedido)
     {
 		$retorno=false;
@@ -490,6 +527,20 @@ class Pedido
 		{
 			$retorno = $consulta->fetchObject('Pedido');
 		}
+
+        return $retorno;
+    }
+
+	public function ObtenerEstadosDelPedido()
+	{
+		$retorno = false;
+
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT estado FROM pedprod WHERE codigoPedido = '$this->codigo';");
+       	if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_OBJ);
+	   	}
 
         return $retorno;
     }
@@ -521,8 +572,6 @@ class Pedido
 			}
 		}
 	}
-
-
 }
 
 ?>

@@ -175,6 +175,11 @@ class Usuario
         $this->estado=$value;
 	}
 
+	public function SetID($value)
+	{
+        $this->id=$value;
+	}
+
 	//CONSTRUCTOR
 
 	public static function CrearUsuario($nombre,$apellido,$email,$clave,$tipo,$rol,$inicioActividades)
@@ -329,20 +334,6 @@ class Usuario
 		return $this->GetEmail() == $email && password_verify($clave,$this->GetClave()); 
 	}
 
-	public function SubirArchivo($origen,$destino,$nombreArchivo,$extension)
-	{
-		if (!file_exists($destino)) 
-		{
-			mkdir($destino, 0777, true);
-		}
-	
-		$destino .= $nombreArchivo . "." . $extension;
-
-		$this->archivoFoto=$destino;
-	
-		move_uploaded_file($origen,$destino);
-	}
-
  	static function GuardarArchivo($path,$contenido,$modo)
 	{
 		$retorno=0;
@@ -488,7 +479,7 @@ class Usuario
     public function AgregarUsuarioDatabase()
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
-	   $claveHash=password_hash($this->clave,PASSWORD_DEFAULT);
+	   $claveHash=password_hash($this->GetClave(),PASSWORD_DEFAULT);
        $consulta = $objetoAccesoDato->prepararConsulta("INSERT into usuarios (nombre,apellido,email,clave,tipo,rol,fechaDeInicioActividades,estado)values('$this->nombre','$this->apellido','$this->email','$claveHash','$this->tipo','$this->rol','$this->fechaDeInicioActividades','$this->estado')");
        $consulta->execute();
     }

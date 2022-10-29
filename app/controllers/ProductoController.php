@@ -75,7 +75,7 @@ class ProductoController extends Producto implements IApiUsable
 
       // Creamos el producto
       $producto = Producto::CrearProducto($nombre,$tipo,$rol,$fechaDeCreacion,$precio);
-      $producto->SetId($idProducto);
+      $producto->SetID($idProducto);
 
       Producto::ModificarProducto($producto) ? $payload = json_encode(array("mensaje" => "Producto modificado con exito")) : $payload = json_encode(array("mensaje" => "Hubo un error al modificar el producto"));;
 
