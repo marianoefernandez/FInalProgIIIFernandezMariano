@@ -122,14 +122,16 @@ class PedidoController extends Pedido implements IApiUsable
     public function TraerUno($request, $response, $args)
     {
         // Buscamos usuario por nombre
-        $pedidoId = $args['id'];
-        $pedido = Pedido::ObtenerPedido($pedidoId);
+        $pedidoCodigo = $args['codigoPedido'];
+        $pedido = Pedido::ObtenerPedido($pedidoCodigo);
 
         $payload = json_encode(array("mensaje" => "Id incorrecto"));
 
         if($pedido != false)
         {
-            $payload = json_encode($pedido);
+          $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+          Logs::AgregarLogOperacion($usuarioLoguado,"trajo el pedido con código $pedido->codigo");
+          $payload = Pedido::RetornarUnPedidoString($pedido);
         }
 
         $response->getBody()->write($payload);
@@ -139,16 +141,25 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
+        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
         $listaPedidos = Pedido::ObtenerTodosLosPedidos();
-        $listaUsuarios = Usuario::ObtenerTodosLosUsuarios();
-        $listaMesas = Mesa::ObtenerTodasLasMesas();
-        $listaProductos = Producto::ObtenerTodosLosProductos();
+        $filtro = $args['filtro'];
+        $filtro = strtolower($filtro);
+        $estadoInt = Pedido::ObtenerEstadoInt($filtro);
         //$payload = json_encode(array("listaUsuario" => $lista));
-        $payload = Pedido::RetornarListaDePedidosString($listaPedidos,$listaUsuarios,$listaMesas,$listaProductos,ENPREPARACION);
+        $payload = json_encode(array("mensaje" => "No ingreso un estado válido"));
 
-        if($payload == false)
+        if($estadoInt != -3)
         {
-          $payload = "<h1>No se dio de alta ningun pedido<h1>";
+          $payload = Pedido::RetornarListaDePedidosString($listaPedidos,$estadoInt); 
+          if($payload != false)
+          {            
+            Logs::AgregarLogOperacion($usuarioLoguado,"trajo los pedidos en estado $filtro");
+          }
+          else
+          {
+            $payload = "<h1>No hay ningun pedido en estado $filtro<h1>";
+          }
         }
 
         $response->getBody()->write($payload);
@@ -203,9 +214,7 @@ class PedidoController extends Pedido implements IApiUsable
     public function TraerLosNoEntregadosATiempo($request, $response, $args)
     {
         $listaPedidosNoEntregadosATiempo = Pedido::ObtenerTodosLosPedidosQueNoLlegaronATiempo();
-        $listaUsuarios = Usuario::ObtenerTodosLosUsuarios();
-        $listaMesas = Mesa::ObtenerTodasLasMesas();
-        $payload = Pedido::RetornarListaDePedidosString($listaPedidosNoEntregadosATiempo,$listaUsuarios,$listaMesas,TERMINADO);
+        $payload = Pedido::RetornarListaDePedidosString($listaPedidosNoEntregadosATiempo,TERMINADO);
         $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
         
         $payload != false ? Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los pedidos no entregados a tiempo")
@@ -216,21 +225,6 @@ class PedidoController extends Pedido implements IApiUsable
           ->withHeader('Content-Type', 'text/html');
     }
 
-    public function TraerLosCancelados($request, $response, $args)
-    {
-        $listaPedidos = Pedido::ObtenerTodosLosPedidos();
-        $listaUsuarios = Usuario::ObtenerTodosLosUsuarios();
-        $listaMesas = Mesa::ObtenerTodasLasMesas();
-        $payload = Pedido::RetornarListaDePedidosString($listaPedidos,$listaUsuarios,$listaMesas,CANCELADO);
-        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
-        
-        $payload != false ? Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los pedidos cancelados")
-        : $payload = "<h1>No hay ningun pedido que haya sido cancelado<h1>";
-
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'text/html');
-    }
     
     public function ModificarUno($request, $response, $args)
     {

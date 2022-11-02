@@ -17,6 +17,7 @@ require __DIR__ . '/controllers/UsuarioController.php';
 require __DIR__ . '/controllers/PedidoController.php';
 require __DIR__ . '/controllers/ProductoController.php';
 require __DIR__ . '/controllers/LogLoginController.php';
+require __DIR__ . '/controllers/ClientesController.php';
 require __DIR__ . '/controllers/LogOperacionesController.php';
 require __DIR__ . './middlewares/MWVerificar.php';
 require_once './db/AccesoDatos.php';
@@ -195,9 +196,8 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
     });
 
     $group->post('/crearPedido',\PedidoController::class . ':CrearUno')->add(new MWVerificar("empleado","mozo"));
-    $group->post('/cargarPedido/{id}',\PedidoController::class . ':CargarUno')->add(new MWVerificar("empleado","mozo"));
+    $group->post('/cargarPedido/{codigoPedido}',\PedidoController::class . ':CargarUno')->add(new MWVerificar("empleado","mozo"));
     $group->post('/subirFoto/{codigoPedido}',\PedidoController::class . ':SubirFoto')->add(new MWVerificar("empleado","mozo"));
-    $group->get('/listarPedidos',\PedidoController::class . ':TraerTodos');
     $group->delete('/borrarUno',\ProductoController::class . ':BorrarUno');
     $group->put('/modificarUno',\ProductoController::class . ':ModificarUno');
 
@@ -210,8 +210,9 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
     //8-c Los que no se entregaron en el tiempo estipulado
     $group->get('/noEntregadosATiempo',\PedidoController::class . ':TraerLosNoEntregadosATiempo')->add(new MWVerificar("socio","todos"));
 
-    //8-d Los cancelados.
-    $group->get('/cancelados',\PedidoController::class . ':TraerLosCancelados')->add(new MWVerificar("socio","todos"));
+    //8-d Los cancelados Muestra pedidos en un filtro (No muestra sus productos) -> Sólo admin
+    //También trae pendientes, en preparación y terminados por si se desea ver
+    $group->get('/traerPedidosPorEstado/{filtro}',\PedidoController::class . ':TraerTodos')->add(new MWVerificar("socio","todos"));
     
 
 });
@@ -219,8 +220,8 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
 
 $app->group('/clientes', function (RouteCollectorProxy $group)
 {
-    $group->post('/darOpinion',\PedidoController::class . ':CrearUno');
-    $group->get('/MostrarInfoPedido',\PedidoController::class . ':CrearUno');
+    $group->post('/darOpinion',\ClientesController::class . ':DarOpinion');
+    $group->get('/mostrarTiempoDemora',\ClientesController::class . ':TraerTiempoDemora');
 
 });
 

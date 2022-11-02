@@ -1,6 +1,7 @@
 <?php
 require_once '../app/models/Mesa.php';
 require_once '../app/models/Usuario.php';
+require_once '../app/models/Opinion.php';
 require_once '../app/models/Logs.php';
 require_once '../app/interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
@@ -244,12 +245,12 @@ class MesaController extends Mesa implements IApiUsable
         if($mesa != false)
         {
           $payload = json_encode(array("mensaje" => "No hay ningun comentario que corresponda dicha mesa"));
-          $comentarios = Mesa::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MAX");
+          $comentarios = Opinion::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MAX");
 
           if(count($comentarios)>0)
           {
             $payload = "Los comentarios con la más alta calificación para la mesa con código $mesa->codigo son<br><br>";
-            $payload .= Mesa::RetornarListaComentarios($comentarios);
+            $payload .= Opinion::RetornarListaComentarios($comentarios);
           }
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios mejor valorados de la mesa con código $mesa->codigo");
         }
@@ -272,12 +273,12 @@ class MesaController extends Mesa implements IApiUsable
         if($mesa != false)
         {
           $payload = json_encode(array("mensaje" => "No hay ningun comentario que corresponda dicha mesa"));
-          $comentarios = Mesa::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MIN");
+          $comentarios = Opinion::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MIN");
 
           if(count($comentarios)>0)
           {
             $payload = "Los comentarios con la más baja calificación para la mesa con código $mesa->codigo son<br><br>";
-            $payload .= Mesa::RetornarListaComentarios($comentarios);
+            $payload .= Opinion::RetornarListaComentarios($comentarios);
           }
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios peor valorados de la mesa con código $mesa->codigo");
         }
@@ -334,29 +335,30 @@ class MesaController extends Mesa implements IApiUsable
 
         if($mesa != false)
         {
-          $estado = Mesa::ValidarEstado($estado); 
-        if($estado != false)
-        {
+          $estado = strtolower($estado);
           $estadoInt = Mesa::ObtenerEstadoInt($estado);
-          $payload = json_encode(array("mensaje" => "No se modifico porque el estado de la mesa ya estaba como " . $estado));          
-        
-          if($mesa->GetEstado() != $estadoInt)
-          {
-            $payload = json_encode(array("mensaje" => "Sólo un socio puede cerrar la mesa "));          
 
-            if($mesa->GetEstado() > -1 || $usuarioLoguado->GetTipo() == "socio")
+          if($estadoInt != -3)
+          {
+            $payload = json_encode(array("mensaje" => "No se modifico porque el estado de la mesa ya estaba como " . $estado));          
+        
+            if($mesa->GetEstado() != $estadoInt)
             {
-              Mesa::CambiarEstadoMesa($mesa,$estadoInt);
-              $payload = json_encode(array("mensaje" => "El estado de la mesa se modifico con exito y paso a ser " . $estado));          
-              Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado de la mesa con código $mesa->codigo a $estado ");
-              $response->withStatus(200);
+              $payload = json_encode(array("mensaje" => "Sólo un socio puede cerrar la mesa "));          
+  
+              if($mesa->GetEstado() > -1 || $usuarioLoguado->GetTipo() == "socio")
+              {
+                Mesa::CambiarEstadoMesa($mesa,$estadoInt);
+                $payload = json_encode(array("mensaje" => "El estado de la mesa se modifico con exito y paso a ser " . $estado));          
+                Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado de la mesa con código $mesa->codigo a $estado ");
+                $response->withStatus(200);
+              }
             }
           }
-        }
-        else
-        {
-          $payload = json_encode(array("mensaje" => "Hubo un error al modificar el estado de la mesa"));          
-        }
+          else
+          {
+            $payload = json_encode(array("mensaje" => "Hubo un error al modificar el estado de la mesa"));          
+          }
         }
 
         $response->getBody()->write($payload);

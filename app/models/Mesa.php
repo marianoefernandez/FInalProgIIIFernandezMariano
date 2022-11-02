@@ -147,19 +147,6 @@ class Mesa
 	}
 	*/
 
-	public static function ValidarEstado($estado)
-	{
-		$retorno = false;
-
-		if(is_string($estado) && isset($estado))
-		{	
-			Mesa::ObtenerEstadoInt(strtolower($estado)) > -2 ? $retorno = $estado :
-			$retorno = false;
-		}
-
-		return $retorno;
-	}
-
 	public static function ObtenerEstadoInt($estado)
 	{
 		switch($estado)
@@ -181,7 +168,7 @@ class Mesa
 			break;
 			
 			default:
-				return false;
+				return -2;
 			break;
 		}
 	}

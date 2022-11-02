@@ -14,8 +14,8 @@ require_once "./db/AccesoDatos.php";
 require_once "Archivos.php";
 require_once "Producto.php";
 define('CANCELADO',-2);
-define('PENDIENTE',-1);
-define('ENPREPARACION',0);
+define('ENPREPARACION',-1);
+define('PENDIENTE',0);
 define('TERMINADO',1);
 
 
@@ -351,10 +351,84 @@ class Pedido
 		return $retorno;
 	}
 
-	public static function RetornarListaDePedidosString($listaPedidos,$listaUsuarios,$listaMesas,$estado)
+	public static function RetornarInfoPedidoString($pedido)
+	{
+		$retorno=false;
+		$usuario = Usuario::ObtenerUsuario($pedido->GetIDUsuario());
+
+		if($pedido != false && $usuario != false)
+		{
+			$retorno.=("<tr align='center'>");
+			$retorno.=("<td>".$pedido->GetCodigo()."</td>");
+			$retorno.=("<td>".$usuario->GetNombre() . " ". $usuario->GetApellido() ."</td>");
+			$retorno.=("<td>".$pedido->GetCodigoMesa()."</td>");
+			
+			$retorno.=("<td>".$pedido->CalcularTiempoDePreparacion()."</td>");
+			
+			if($pedido->GetEstado() == CANCELADO)
+			{
+				$tiempoRestante = "El pedido fue cancelado";
+			}
+			else
+			{
+				$pedido->VerificarSiTerminoElPedido() 
+				? $tiempoRestante = "Terminado"
+				: $tiempoRestante = $pedido->CalcularTiempoDeRestante();
+			}
+			
+			$retorno.=("<td>".$tiempoRestante."</td>");
+			$retorno.=("</tr>");
+		}
+
+		return $retorno;
+    }
+
+	public static function RetornarUnPedidoString($pedido)
+	{
+		$retorno=false;
+		$infoPedido = Pedido::RetornarInfoPedidoString($pedido);
+
+		if($infoPedido != false)
+		{
+			$retorno=("<table>");
+			$retorno.=("<th>[Pedido Codigo]</th><th>[Atendio]</th><th>[Mesa Codigo]</th><th>[Tiempo de Preparación Aproximado]</th><th>[Tiempo Restante Aproximado]</th>");
+			$retorno.= $infoPedido;
+			$retorno.=("</table>");
+		}
+
+		return $retorno;
+    }
+
+	public static function RetornarTiempoDemora($pedido)
+	{
+		$retorno=false;
+
+		if($pedido != false)
+		{
+			$retorno.=("<h3>Tiempo de preparación (Aproximado) : ".$pedido->CalcularTiempoDePreparacion()."<h3>");
+
+			if($pedido->GetEstado() == CANCELADO)
+			{
+				$tiempoRestante = "El pedido fue cancelado";
+			}
+			else
+			{
+				$pedido->VerificarSiTerminoElPedido() 
+				? $tiempoRestante = "El pedido ya fue entregado"
+				: $tiempoRestante = $pedido->CalcularTiempoDeRestante();
+			}
+			
+			$retorno.=("<h3>Tiempo restante (Aproximado) : ".$tiempoRestante."<h3>");
+		}
+
+		return $retorno;
+    }
+
+	public static function RetornarListaDePedidosString($listaPedidos,$estado)
 	{
 		$flag=0;
 		$len = count($listaPedidos);
+		$contador = 0;
 		$retorno=false;
 
 		if($len>0)
@@ -363,31 +437,15 @@ class Pedido
 			$retorno.=("<th>[Pedido Codigo]</th><th>[Atendio]</th><th>[Mesa Codigo]</th><th>[Tiempo de Preparación Aproximado]</th><th>[Tiempo Restante Aproximado]</th>");
 			foreach($listaPedidos as $pedido)
 			{
-				$usuario = Usuario::ObtenerUsuario($pedido->GetIDUsuario());
-
-				if($pedido->GetEstado()==$estado && $usuario != false)
+				if($pedido->GetEstado() == $estado)
 				{
-					
-					$retorno.=("<tr align='center'>");
-					$retorno.=("<td>".$pedido->GetCodigo()."</td>");
-					$retorno.=("<td>".$usuario->GetNombre() . " ". $usuario->GetApellido() ."</td>");
-					$retorno.=("<td>".$pedido->GetCodigoMesa()."</td>");
-					$retorno.=("<td>".$pedido->CalcularTiempoDePreparacion(). " segundos" ."</td>");
-					
-					if($pedido->GetEstado() == CANCELADO)
+					$infoPedido = Pedido::RetornarInfoPedidoString($pedido);
+
+					if($infoPedido != false)
 					{
-						$tiempoRestante = "El pedido fue cancelado";
+						$retorno.=$infoPedido;
+						$flag=1;
 					}
-					else
-					{
-						$pedido->VerificarSiTerminoElPedido() 
-						? $tiempoRestante = "Terminado"
-						: $tiempoRestante = $pedido->CalcularTiempoDeRestante();
-					}
-					
-					$retorno.=("<td>".$tiempoRestante."</td>");
-					$retorno.=("</tr>");
-					$flag=1;
 				}
 			}
 			$retorno.=("</table>");
@@ -401,16 +459,70 @@ class Pedido
 		return $retorno;
     }
 
+	public static function RetornarUnPedidoConProductosString($pedido)
+	{
+		//A DESARROLLAR
+    }
+
+	public static function RetornarListaDePedidosConProductosString($listaPedidos,$estado)
+	{
+		//A DESARROLLAR
+    }
+
+	public static function ObtenerEstadoInt($estado)
+	{
+		switch($estado)
+		{
+			case "terminado":
+				return 1;
+			break;
+			
+			case "pendiente":
+				return 0;
+			break;
+			
+			case "enpreparacion":
+				return -1;
+			break;
+
+			case "cancelado":
+				return -2;
+			break;
+			
+			default:
+				return -3;
+			break;
+		}
+	}
+
 	public function CalcularTiempoDePreparacion()
 	{
-		return $this->GetHoraFinal()->getTimestamp()-$this->GetHoraInicio()->getTimestamp();
+		$retorno = "Pendiente";
+		$horaInicio = $this->GetHoraInicio();
+		$horaFinal = $this->GetHoraFinal();
+
+		if(isset($horaInicio) && isset($horaFinal))
+		{
+			$retorno = $horaFinal->getTimestamp() - $horaInicio->getTimestamp();
+			$retorno .= " segundos";
+		}
+
+		return $retorno;
 	}
 
 	public function CalcularTiempoDeRestante()
 	{
+		$retorno = "Pendiente";
+		$horaInicio = $this->GetHoraInicio();
+		$horaFinal = $this->GetHoraFinal();
 		$horaActual = new DateTime(date("Y-m-j H:i:s"));
 
-		return $this->GetHoraFinal()->getTimestamp() - $horaActual->getTimestamp() > 0 ? $this->GetHoraFinal()->getTimestamp() - $horaActual->getTimestamp() . " segundos" : "Aguarde un momento el pedido está tardando más de lo estimado";
+		if(isset($horaInicio) && isset($horaFinal))
+		{
+			$retorno = $horaFinal->getTimestamp() - $horaActual->getTimestamp() > 0 ? $horaFinal->getTimestamp() - $horaActual->getTimestamp() . " segundos" : "Aguarde un momento el pedido está tardando más de lo estimado";
+		}
+
+		return $retorno;
 	}
 
 	public function VerificarSiTerminoElPedido()
