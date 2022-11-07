@@ -185,16 +185,16 @@ class Producto
 	}
 
 	
-	public static function ObtenerCantidadVendidosProductoMayor()
-	{
-		$listaProductos = Producto::ObtenerTodosLosProductos();
-		
+	public static function ObtenerCantidadVendidosProductoMayor($listaProductos,$fechaIncial,$fechaFinal)
+	{		
 		$maximo = false;
+		$tieneFecha = ($fechaIncial != "" && $fechaFinal != "");
 
 		foreach ($listaProductos as $producto) 
 		{
+			$tieneFecha ? $contador = $producto->CantidadDeVentasEntreDosFechas($fechaIncial,$fechaFinal) :
 			$contador = $producto->CantidadDeVentas();
-
+			
 			if($contador > $maximo || $maximo == false)
 			{
 				$maximo = $contador;
@@ -204,14 +204,14 @@ class Producto
 		return $maximo;
 	}
 
-	public static function ObtenerCantidadVendidosProductoMenor()
-	{
-		$listaProductos = Producto::ObtenerTodosLosProductos();
-		
+	public static function ObtenerCantidadVendidosProductoMenor($listaProductos,$fechaIncial,$fechaFinal)
+	{		
 		$minimo = false;
+		$tieneFecha = ($fechaIncial != "" && $fechaFinal != "");
 
 		foreach ($listaProductos as $producto) 
 		{
+			$tieneFecha ? $contador = $producto->CantidadDeVentasEntreDosFechas($fechaIncial,$fechaFinal) :
 			$contador = $producto->CantidadDeVentas();
 
 			if($contador < $minimo || $minimo == false)
@@ -223,16 +223,17 @@ class Producto
 		return $minimo;
 	}
 
-	public static function RetornarProductosPorCantidadDeVentas($cantidad)
+	public static function RetornarProductosPorCantidadDeVentas($listaProductos,$fechaIncial,$fechaFinal,$cantidad)
 	{
-		$listaProductos = Producto::ObtenerTodosLosProductos();
 		$productos = false;
+		$tieneFecha = ($fechaIncial != "" && $fechaFinal != "");
 
 		if(isset($cantidad) && is_numeric($cantidad))
 		{
 			$productos = array();
 			foreach ($listaProductos as $producto) 
 			{
+				$tieneFecha ? $contador = $producto->CantidadDeVentasEntreDosFechas($fechaIncial,$fechaFinal) :
 				$contador = $producto->CantidadDeVentas();
 
 				if($contador == $cantidad)
@@ -331,24 +332,32 @@ class Producto
 		return $retorno;
 	}
 
-	public static function RetornarListaDeProductosString($listaProductos)
+	public static function RetornarListaDeProductosString($listaProductos,$fecha1,$fecha2)
 	{
 		$len = count($listaProductos);
 		$retorno="<h1>No hay productos dados de alta<h1>";
-
+		$existeFecha = ($fecha1 != "" && $fecha2 != "");
 
 		if($len>0)
 		{
 			$retorno=("<table>");
-			$retorno.=("<th>[Nombre]</th><th>[Tipo]</th><th>[Rol]</th><th>[Precio]</th><th>[Fecha de Creación]</th>");
+			$retorno.=("<th>[Nombre]</th><th>[Tipo]</th><th>[Rol]</th><th>[Precio]</th><th>[Fecha de Creación]<th>[Cantidad de Ventas]</th></th>");
 			foreach($listaProductos as $producto)
 			{
 				$retorno.=("<tr align='center'>");
-				$retorno.=("<td>[".$producto->GetNombre()."]</td>");
-				$retorno.=("<td>[".$producto->GetTipo()."]</td>");
-				$retorno.=("<td>[".$producto->GetRol()."]</td>");
-				$retorno.=("<td>[".$producto->GetPrecio()."]</td>");
-				$retorno.=("<td>[".$producto->GetFechaCreacion()."]</td>");
+				$retorno.=("<td>".$producto->GetNombre()."</td>");
+				$retorno.=("<td>".$producto->GetTipo()."</td>");
+				$retorno.=("<td>".$producto->GetRol()."</td>");
+				$retorno.=("<td>$".$producto->GetPrecio()."</td>");
+				$retorno.=("<td>".$producto->GetFechaCreacion()."</td>");
+				if($existeFecha)
+				{
+					$retorno.=("<td>".$producto->CantidadDeVentasEntreDosFechas($fecha1,$fecha2)."</td>");
+				}
+				else
+				{
+					$retorno.=("<td>".$producto->CantidadDeVentas()."</td>");
+				}
 				$retorno.=("</tr>");
 			}
 			$retorno.=("</table>");
@@ -357,7 +366,21 @@ class Producto
 		return $retorno;
     }
 
-	
+	public static function ObtenerProductosOrdenadosPorCantidad($fechaInicio,$fechaFinal)
+	{
+		$existeFecha = ($fechaInicio != "" && $fechaFinal != "");
+
+		if($existeFecha)
+		{
+			$retorno = Producto::ObtenerTodosLosProductosOrdenadosPorCantidadEntreDosFechas($fechaInicio,$fechaFinal,"DESC");
+		}
+		else
+		{
+			$retorno = Producto::ObtenerTodosLosProductosOrdenadosPorCantidad("DESC");
+		}
+
+		return $retorno;
+    }
 
     //METODOS DATABASE
 
@@ -399,6 +422,47 @@ class Producto
         return $retorno;
     }
 
+	public static function ObtenerTodosLosProductosOrdenadosPorCantidad($condicion)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta
+		(
+			"SELECT p.id,p.nombre,p.tipo,p.rol,p.fechaDeCreacion,p.precio FROM productos p LEFT JOIN pedprod pp ON pp.idProducto = p.id
+			GROUP BY p.id 
+			ORDER BY SUM(pp.cantidad) $condicion;"
+		);
+        $consulta->execute();
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Producto');
+		}
+
+        return $retorno;
+    }
+
+	public static function ObtenerTodosLosProductosOrdenadosPorCantidadEntreDosFechas($fecha1,$fecha2,$condicion)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta
+		(
+			"SELECT p.id,p.nombre,p.tipo,p.rol,p.fechaDeCreacion,p.precio FROM productos p LEFT JOIN pedprod pp ON pp.idProducto = p.id 
+			AND pp.horaFinal BETWEEN '$fecha1 00:00:00' AND '$fecha2 23:59:59'
+			GROUP BY p.id 
+			ORDER BY SUM(pp.cantidad) $condicion;"
+		);
+        $consulta->execute();
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Producto');
+		}
+
+        return $retorno;
+    }
+
     public static function ObtenerProducto($id)
     {
 		$retorno=false;
@@ -418,7 +482,7 @@ class Producto
     {
 		$retorno=false;
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT SUM(pp.cantidad) FROM pedprod pp INNER JOIN PRODUCTOS p ON p.id = pp.idProducto WHERE p.id = $this->id;");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT SUM(pp.cantidad) FROM pedprod pp INNER JOIN PRODUCTOS p ON p.id = pp.idProducto WHERE p.id = $this->id AND pp.estado = 2;");
 
 		if($consulta->execute())
 		{
@@ -434,6 +498,25 @@ class Producto
         return $retorno;
     }
 
+	public function CantidadDeVentasEntreDosFechas($fecha1,$fecha2)
+    {
+		$retorno=false;
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT SUM(pp.cantidad) FROM pedprod pp INNER JOIN PRODUCTOS p ON p.id = pp.idProducto AND  pp.estado = 2 AND p.id = $this->id AND pp.horaFinal BETWEEN '$fecha1 00:00:00' AND '$fecha2 23:59:59'");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetch(PDO::FETCH_NUM);
+			$retorno = $retorno[0];
+		}
+
+		if(isset($retorno) == false)
+		{
+			$retorno = 0;
+		}
+
+        return $retorno;
+    }
 }
 
 ?>

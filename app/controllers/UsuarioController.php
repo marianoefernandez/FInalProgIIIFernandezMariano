@@ -30,27 +30,34 @@ class UsuarioController extends Usuario implements IApiUsable
         $tipo = $parametros['tipo'];
         $rol = $parametros['rol'];
         $fechaDeCreacion = $parametros['inicioActividades'];
-        $payload = json_encode(array("mensaje" => "Hubo un error al crear al usuario"));
+        $payload = json_encode(array("mensaje" => "Datos de rol o tipo erroneos"));
         $response->withStatus(401);
         
-
-        // Creamos el usuario
-        $usuario = Usuario::CrearUsuario($nombre,$apellido,$email,$clave,$tipo,$rol,$fechaDeCreacion);
-
-        if(Usuario::AltaUsuario($usuario) == 1)
+        if(isset($fechaDeCreacion) || $fechaDeCreacion == "")
         {
-          $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
-          $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
-          Logs::AgregarLogOperacion($usuarioLoguado,"dio de alta un nuevo usuario llamado $usuario->nombre $usuario->apellido con email $usuario->email");
+          $fechaDeCreacion = date("Y-m-d");  
         }
-        else
+
+        if(($tipo == "socio" || $tipo == "empleado") && ($rol == "bartender" || $rol == "cocinero" || $rol == "mozo" || $rol == "cervecero"))
         {
-          if(Usuario::AltaUsuario($usuario) == 0)
+          // Creamos el usuario
+          $payload = json_encode(array("mensaje" => "Hubo un error al crear al usuario"));
+          $usuario = Usuario::CrearUsuario($nombre,$apellido,$email,$clave,$tipo,$rol,$fechaDeCreacion);
+
+          if(Usuario::AltaUsuario($usuario) == 1)
           {
-            $payload = json_encode(array("mensaje" => "El email ya esta en uso"));
+            $payload = json_encode(array("mensaje" => "Usuario creado con exito"));
+            $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+            Logs::AgregarLogOperacion($usuarioLoguado,"dio de alta un nuevo usuario llamado $usuario->nombre $usuario->apellido con email $usuario->email");
           }
+          else
+          {
+            if(Usuario::AltaUsuario($usuario) == 0)
+            {
+              $payload = json_encode(array("mensaje" => "El email ya esta en uso"));
+            }
+          }          
         }
-
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }

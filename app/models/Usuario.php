@@ -525,6 +525,15 @@ class Usuario
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
     }
 
+    public static function ObtenerTodosLosUsuariosOrdenadosPorRol()
+    {
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, nombre,apellido,email,clave,tipo,rol,fechaDeInicioActividades,estado FROM usuarios ORDER BY rol");
+        $consulta->execute();
+
+        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Usuario');
+    }
+
     public static function ObtenerUsuario($id)
     {
 		$retorno=false;

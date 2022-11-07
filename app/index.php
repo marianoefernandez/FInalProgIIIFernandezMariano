@@ -18,6 +18,7 @@ require __DIR__ . '/controllers/PedidoController.php';
 require __DIR__ . '/controllers/ProductoController.php';
 require __DIR__ . '/controllers/LogLoginController.php';
 require __DIR__ . '/controllers/ClientesController.php';
+require __DIR__ . '/controllers/OpinionController.php';
 require __DIR__ . '/controllers/LogOperacionesController.php';
 require __DIR__ . './middlewares/MWVerificar.php';
 require_once './db/AccesoDatos.php';
@@ -126,7 +127,6 @@ $app->group('/productos', function (RouteCollectorProxy $group)
     $group->get('/listarUno/{id}', \ProductoController::class . ':TraerUno');
     $group->delete('/borrarUno',\ProductoController::class . ':BorrarUno');
     $group->put('/modificarUno',\ProductoController::class . ':ModificarUno');
-
 })->add(new MWVerificar("socio","todos"));
 
 //Mesas
@@ -161,7 +161,6 @@ $app->group('/mesas', function (RouteCollectorProxy $group)
 
     //9-d La que menos facturó.    
     $group->get('/menorRecaudacion',\MesaController::class . ':TraerMesasQueMenosRecaudaron')->add(new MWVerificar("socio","todos"));
-
     
     //9-e La/s que tuvo la factura con el mayor importe.
     $group->get('/facturaMayor',\MesaController::class . ':TraerMesasConFacturaMayor')->add(new MWVerificar("socio","todos"));
@@ -172,13 +171,15 @@ $app->group('/mesas', function (RouteCollectorProxy $group)
     //9-g Lo que facturó entre dos fechas dadas.
     $group->get('/facturaEntreDosFechas/{codigoMesa}',\MesaController::class . ':TraerRecaudacionEntreFechas')->add(new MWVerificar("socio","todos"));
 
-    
     //9-h Mejores comentarios.
-    $group->get('/mejoresComentarios/{codigoMesa}',\MesaController::class . ':TraerMejoresComentarios')->add(new MWVerificar("socio","todos"));
+    $group->get('/mejoresComentarios/{codigoMesa}',\OpinionController::class . ':TraerMejoresComentariosPorMesa')->add(new MWVerificar("socio","todos"));
 
     //9-i Peores comentarios.
-    $group->get('/peoresComentarios/{codigoMesa}',\MesaController::class . ':TraerPeoresComentarios')->add(new MWVerificar("socio","todos"));
+    $group->get('/peoresComentarios/{codigoMesa}',\OpinionController::class . ':TraerPeoresComentariosPorMesa')->add(new MWVerificar("socio","todos"));    
 
+    //21- Alguno de los socios pide un listado de las mesas ordenadas de la que hizo la factura
+    //más barata a la más cara.
+    $group->get('/mesasOrdenadasPorRecaudacion',\MesaController::class . ':TraerMesasOrdenadasPorRecaudacion')->add(new MWVerificar("socio","todos"));
 });
 
 //Pedidos
@@ -213,7 +214,15 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
     //8-d Los cancelados Muestra pedidos en un filtro (No muestra sus productos) -> Sólo admin
     //También trae pendientes, en preparación y terminados por si se desea ver
     $group->get('/traerPedidosPorEstado/{filtro}',\PedidoController::class . ':TraerTodos')->add(new MWVerificar("socio","todos"));
-    
+
+    //7- La moza se fija los pedidos que están listos para servir , cambia el estado de la mesa
+    $group->get('/traerPedidosListos',\PedidoController::class . ':TraerPedidosListos')->add(new MWVerificar("empleado","mozo"));
+    $group->put('/servirPedido',\PedidoController::class . ':ServirUnPedido')->add(new MWVerificar("empleado","mozo"));
+
+
+    //19- Alguno de los socios pide un listado del producto ordenado del que más se vendió 
+    //al que menos se vendió.
+    $group->get('/traerProductosMasVendidoAMenosVendido',\PedidoController::class . ':TraerProductosMasVendidoAMenosVendido')->add(new MWVerificar("socio","todos"));
 
 });
 
@@ -222,6 +231,13 @@ $app->group('/clientes', function (RouteCollectorProxy $group)
 {
     $group->post('/darOpinion',\ClientesController::class . ':DarOpinion');
     $group->get('/mostrarTiempoDemora',\ClientesController::class . ':TraerTiempoDemora');
+
+});
+
+$app->group('/opiniones', function (RouteCollectorProxy $group) 
+{
+    $group->get('/mejoresComentarios/{filtro}',\OpinionController::class . ':TraerMejoresComentarios')->add(new MWVerificar("socio","todos"));
+    $group->get('/peoresComentarios/{filtro}',\OpinionController::class . ':TraerPeoresComentarios')->add(new MWVerificar("socio","todos"));
 
 });
 

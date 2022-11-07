@@ -8,6 +8,7 @@ class ProductoController extends Producto implements IApiUsable
     {
         $parametros = $request->getParsedBody();
 
+        $payload = json_encode(array("mensaje" => "Debe ingresar un rol valido"));
         $nombre = $parametros['nombre'];
         $tipo = $parametros['tipo'];
         $rol = $parametros['rol'];
@@ -20,9 +21,11 @@ class ProductoController extends Producto implements IApiUsable
         }
 
         // Creamos el producto
-        $producto = Producto::CrearProducto($nombre,$tipo,$rol,$fechaDeCreacion,$precio);
-
-        Producto::AltaProducto($producto) ? $payload = json_encode(array("mensaje" => "Producto creado con exito")) : $payload = json_encode(array("mensaje" => "Hubo un error al crear el producto"));;
+        if($rol == "bartender" || $rol == "cocinero" || $rol == "mozo" || $rol == "cervecero")
+        {
+          $producto = Producto::CrearProducto($nombre,$tipo,$rol,$fechaDeCreacion,$precio);
+          Producto::AltaProducto($producto) ? $payload = json_encode(array("mensaje" => "Producto creado con exito")) : $payload = json_encode(array("mensaje" => "Hubo un error al crear el producto"));
+        }
 
         $response->getBody()->write($payload);
         return $response
@@ -50,7 +53,7 @@ class ProductoController extends Producto implements IApiUsable
     public function TraerTodos($request, $response, $args)
     {
         $listaProductos = Producto::ObtenerTodosLosProductos();
-        $payload = Producto::RetornarListaDeProductosString($listaProductos);
+        $payload = Producto::RetornarListaDeProductosString($listaProductos,"","");
 
         $response->getBody()->write($payload);
         return $response
@@ -67,17 +70,20 @@ class ProductoController extends Producto implements IApiUsable
       $fechaDeCreacion = $parametros['fechaDeCreacion'];
       $precio = $parametros['precio'];
       $idProducto = $parametros['idProducto']; 
+      $payload = json_encode(array("mensaje" => "Debe ingresar un rol válido"));
 
       if(isset($fechaDeCreacion) || $fechaDeCreacion == "")
       {
          $fechaDeCreacion = date("Y-m-j H:i:s");
       }
+      if($rol == "bartender" || $rol == "cocinero" || $rol == "mozo" || $rol == "cervecero")
+      {
+        // Creamos el producto
+        $producto = Producto::CrearProducto($nombre,$tipo,$rol,$fechaDeCreacion,$precio);
+        $producto->SetID($idProducto);
 
-      // Creamos el producto
-      $producto = Producto::CrearProducto($nombre,$tipo,$rol,$fechaDeCreacion,$precio);
-      $producto->SetID($idProducto);
-
-      Producto::ModificarProducto($producto) ? $payload = json_encode(array("mensaje" => "Producto modificado con exito")) : $payload = json_encode(array("mensaje" => "Hubo un error al modificar el producto"));;
+        Producto::ModificarProducto($producto) ? $payload = json_encode(array("mensaje" => "Producto modificado con exito")) : $payload = json_encode(array("mensaje" => "Hubo un error al modificar el producto"));;
+      }
 
       $response->getBody()->write($payload);
       return $response

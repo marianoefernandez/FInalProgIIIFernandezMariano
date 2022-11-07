@@ -1,6 +1,7 @@
 <?php
 require_once '../app/models/Mesa.php';
 require_once '../app/models/Usuario.php';
+require_once '../app/models/Pedido.php';
 require_once '../app/models/Opinion.php';
 require_once '../app/models/Logs.php';
 require_once '../app/interfaces/IApiUsable.php';
@@ -14,6 +15,13 @@ class MesaController extends Mesa implements IApiUsable
         $payload = json_encode(array("mensaje" => "Hubo un error al crear la mesa"));
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
         $fechaDeCreacion = $parametros['fechaDeCreacion'];
+
+        
+        if(isset($fechaDeCreacion) || $fechaDeCreacion == "")
+        {
+          $fechaDeCreacion = date("Y-m-d");  
+        }
+
 
         // Creamos la mesa
         $mesa = Mesa::ConstruirMesa(CERRADA,$fechaDeCreacion);
@@ -54,21 +62,34 @@ class MesaController extends Mesa implements IApiUsable
 
     public function TraerMesasMasUsadas($request, $response, $args)
     {
-      $payload = "No hay ninguna mesa dada de alta";
-      $maximo = Mesa::ObtenerMayorCantidadPedidosPorMesa();
-      $mesasMasUsadas = Mesa::RetornarMesasPorCantidadPedidos($maximo);
-      $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
-
-      if($mesasMasUsadas != false && count($mesasMasUsadas) > 0)
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      
+      if($formatoFecha)
       {
-        count($mesasMasUsadas) > 1 ? $payload = "Las mesas más usadas son <br><br>"
-        : $payload = "La mesa más usada es <br><br>";
-        $payload .= Mesa::RetornarListaDeMesasString($mesasMasUsadas);
-        count($mesasMasUsadas) > 1 ? $payload .= "<br>Las mismas tienen $maximo pedidos dados de alta<br>"
-        : $payload .= "<br>La misma tiene $maximo pedidos dados de alta<br>";
+        $payload = json_encode(array("mensaje" => "No se encontraron pedidos en la lista"));
+        $listaMesas = Mesa::ObtenerTodasLasMesas();
+        $listaPedidos = Pedido::TraerPedidosPorFecha($fechaInicio,$fechaFinal);
+        $maximo = Mesa::ObtenerMayorCantidadPedidosPorMesa($listaPedidos,$listaMesas);
+        $mesasMasUsadas = Mesa::RetornarMesasPorCantidadPedidos($listaPedidos,$listaMesas,$maximo);
+        
+        if($mesasMasUsadas != false && count($mesasMasUsadas) > 0)
+        {
+          count($mesasMasUsadas) > 1 ? $payload = "Las mesas más usadas son <br><br>"
+          : $payload = "La mesa más usada es <br><br>";
+          $payload .= Mesa::RetornarListaDeMesasString($mesasMasUsadas);
+          count($mesasMasUsadas) > 1 ? $payload .= "<br>Las mismas tienen $maximo pedidos dados de alta<br>"
+          : $payload .= "<br>La misma tiene $maximo pedidos dados de alta<br>";
 
-        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas usadas");
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas usadas");
+        }
 
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
       }
 
       $response->getBody()->write($payload);
@@ -78,21 +99,33 @@ class MesaController extends Mesa implements IApiUsable
 
     public function TraerMesasMenosUsadas($request, $response, $args)
     {
-      $payload = "No hay ninguna mesa dada de alta";
-      $minimo = Mesa::ObtenerMenorCantidadPedidosPorMesa();
-      $mesasMenosUsadas = Mesa::RetornarMesasPorCantidadPedidos($minimo);
-      $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
 
-      if($mesasMenosUsadas != false && count($mesasMenosUsadas) > 0)
+      if($formatoFecha)
       {
-        count($mesasMenosUsadas) > 1 ? $payload = "Las mesas menos usadas son <br><br>"
-        : $payload = "La mesa menos usada es <br><br>";
-        $payload .= Mesa::RetornarListaDeMesasString($mesasMenosUsadas);
-        count($mesasMenosUsadas) > 1 ? $payload .= "<br>Las mismas tienen $minimo pedidos dados de alta<br>"
-        : $payload .= "<br>La misma tiene $minimo pedidos dados de alta<br>";
+        $payload = json_encode(array("mensaje" => "No se encontraron pedidos en la lista"));
+        $listaMesas = Mesa::ObtenerTodasLasMesas();
+        $listaPedidos = Pedido::TraerPedidosPorFecha($fechaInicio,$fechaFinal);
+        $minimo = Mesa::ObtenerMenorCantidadPedidosPorMesa($listaPedidos,$listaMesas);
+        $mesasMenosUsadas = Mesa::RetornarMesasPorCantidadPedidos($listaPedidos,$listaMesas,$minimo);
 
-        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas menos usadas");
+        if($mesasMenosUsadas != false && count($mesasMenosUsadas) > 0)
+        {
+          count($mesasMenosUsadas) > 1 ? $payload = "Las mesas menos usadas son <br><br>"
+          : $payload = "La mesa menos usada es <br><br>";
+          $payload .= Mesa::RetornarListaDeMesasString($mesasMenosUsadas);
+          count($mesasMenosUsadas) > 1 ? $payload .= "<br>Las mismas tienen $minimo pedidos dados de alta<br>"
+          : $payload .= "<br>La misma tiene $minimo pedidos dados de alta<br>";
 
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas menos usadas");
+        }   
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
       }
       $response->getBody()->write($payload);
       return $response
@@ -102,21 +135,32 @@ class MesaController extends Mesa implements IApiUsable
     
     public function TraerMesasQueMasRecaudaron($request, $response, $args)
     {
-      $payload = "No hay ninguna mesa dada de alta";
-      $maximo = Mesa::ObtenerMayorRecaudacionPorMesa();
-      $mesasQueMasRecaudaron = Mesa::RetornarMesasPorRecaudacion($maximo);
-      $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
 
-      if($mesasQueMasRecaudaron != false && count($mesasQueMasRecaudaron) > 0)
+      if($formatoFecha)
       {
-        count($mesasQueMasRecaudaron) > 1 ? $payload = "Las mesas que más recaudaron son <br><br>"
-        : $payload = "La mesa que más recaudo es <br><br>";
-        $payload .= Mesa::RetornarListaDeMesasString($mesasQueMasRecaudaron);
-        count($mesasQueMasRecaudaron) > 1 ? $payload .= "<br>Las mismas recaudaron $$maximo<br>"
-        : $payload .= "<br>La misma recaudo $$maximo<br>";
-
-        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas dinero recaudaron");
-
+        $listaMesas = Mesa::ObtenerTodasLasMesas();
+        $listaPedidos = Pedido::TraerPedidosPorFecha($fechaInicio,$fechaFinal);
+        $maximo = Mesa::ObtenerMayorRecaudacionPorMesa($listaPedidos,$listaMesas);
+        $mesasQueMasRecaudaron = Mesa::RetornarMesasPorRecaudacion($listaPedidos,$listaMesas,$maximo);
+      
+        if($mesasQueMasRecaudaron != false && count($mesasQueMasRecaudaron) > 0)
+        {
+          count($mesasQueMasRecaudaron) > 1 ? $payload = "Las mesas que más recaudaron son <br><br>"
+          : $payload = "La mesa que más recaudo es <br><br>";
+          $payload .= Mesa::RetornarListaDeMesasString($mesasQueMasRecaudaron);
+          count($mesasQueMasRecaudaron) > 1 ? $payload .= "<br>Las mismas recaudaron $$maximo<br>"
+          : $payload .= "<br>La misma recaudo $$maximo<br>";
+  
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas dinero recaudaron");
+        }
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
       }
 
       $response->getBody()->write($payload);
@@ -126,21 +170,60 @@ class MesaController extends Mesa implements IApiUsable
 
     public function TraerMesasQueMenosRecaudaron($request, $response, $args)
     {
-      $payload = "No hay ninguna mesa dada de alta";
-      $minimo = Mesa::ObtenerMenorRecaudacionPorMesa();
-      $mesasQueMenosRecaudaron = Mesa::RetornarMesasPorRecaudacion($minimo);
-      $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
+        $parametros = $request->getParsedBody();
+        $fechaInicio = $parametros['fechaInicio'];
+        $fechaFinal = $parametros['fechaFinal'];
+        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+        $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+        $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
 
-      if($mesasQueMenosRecaudaron != false && count($mesasQueMenosRecaudaron) > 0)
+      if($formatoFecha)
       {
-        count($mesasQueMenosRecaudaron) > 1 ? $payload = "Las mesas que menos recaudaron son <br><br>"
-        : $payload = "La mesa que menos recaudo es <br><br>";
-        $payload .= Mesa::RetornarListaDeMesasString($mesasQueMenosRecaudaron);
-        count($mesasQueMenosRecaudaron) > 1 ? $payload .= "<br>Las mismas recaudaron $$minimo<br>"
-        : $payload .= "<br>La misma recaudo $$minimo<br>";
+        $listaMesas = Mesa::ObtenerTodasLasMesas();
+        $listaPedidos = Pedido::TraerPedidosPorFecha($fechaInicio,$fechaFinal);
+        $minimo = Mesa::ObtenerMenorRecaudacionPorMesa($listaPedidos,$listaMesas);
+        $mesasQueMenosRecaudaron = Mesa::RetornarMesasPorRecaudacion($listaPedidos,$listaMesas,$minimo);
 
-        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas dinero recaudaron");
+        if($mesasQueMenosRecaudaron != false && count($mesasQueMenosRecaudaron) > 0)
+        {
+          count($mesasQueMenosRecaudaron) > 1 ? $payload = "Las mesas que menos recaudaron son <br><br>"
+          : $payload = "La mesa que menos recaudo es <br><br>";
+          $payload .= Mesa::RetornarListaDeMesasString($mesasQueMenosRecaudaron);
+          count($mesasQueMenosRecaudaron) > 1 ? $payload .= "<br>Las mismas recaudaron $$minimo<br>"
+          : $payload .= "<br>La misma recaudo $$minimo<br>";
+  
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas dinero recaudaron");
+        }
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
+      }
 
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');
+    }
+
+    public function TraerMesasOrdenadasPorRecaudacion($request, $response, $args)
+    {
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+
+      if($formatoFecha)
+      {
+        $listaMesas = Mesa::ObtenerMesasOrdenadasPorRecaudacion($fechaInicio,$fechaFinal);
+      
+        if($listaMesas != false && count($listaMesas) > 0)
+        {
+          $payload = Mesa::RetornarListaDeMesasConRecaudacionString($listaMesas,$fechaInicio,$fechaFinal);
+  
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas ordenadas por recaudación");
+        }
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
       }
 
       $response->getBody()->write($payload);
@@ -151,21 +234,33 @@ class MesaController extends Mesa implements IApiUsable
 
     public function TraerMesasConFacturaMayor($request, $response, $args)
     {
-      $payload = "No hay ninguna mesa dada de alta";
-      $maximo = Pedido::ObtenerMayorRecaudacion();
-      $pedidosMayorRecaudacion = Pedido::RetornarPedidosPorRecaudacion($maximo);
-      $mesasFacturaMayor = Mesa::RetornarMesasAsignadasAPedidos($pedidosMayorRecaudacion);
-      $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
 
-      if($mesasFacturaMayor != false && count($mesasFacturaMayor) > 0 && $pedidosMayorRecaudacion != false && count($pedidosMayorRecaudacion) > 0)
+      if($formatoFecha)
       {
-        $maximo = number_format($maximo, 2, '.', '');
-        count($mesasFacturaMayor) > 1 ? $payload = "Las mesas que tuvieron la factura mayor fueron <br><br>"
-        : $payload = "La mesa que tuvo la factura mayor fue <br><br>";
-        $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMayor);
-        $payload .= "<br>La factura fue de $$maximo<br>";
+        $listaMesas = Mesa::ObtenerTodasLasMesas();
+        $listaPedidos = Pedido::TraerPedidosPorFecha($fechaInicio,$fechaFinal);
+        $maximo = Pedido::ObtenerMayorRecaudacion($listaPedidos);
+        $pedidosMayorRecaudacion = Pedido::RetornarPedidosPorRecaudacion($listaPedidos,$maximo);
+        $mesasFacturaMayor = Mesa::RetornarMesasAsignadasAPedidos($pedidosMayorRecaudacion,$listaMesas);
 
-        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura más cara");
+        if($mesasFacturaMayor != false && count($mesasFacturaMayor) > 0 && $pedidosMayorRecaudacion != false && count($pedidosMayorRecaudacion) > 0)
+        {
+          $maximo = number_format($maximo, 2, '.', '');
+          count($mesasFacturaMayor) > 1 ? $payload = "Las mesas que tuvieron la factura mayor fueron <br><br>"
+          : $payload = "La mesa que tuvo la factura mayor fue <br><br>";
+          $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMayor);
+          $payload .= "<br>La factura fue de $$maximo<br>";
+  
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura más cara");
+        }
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";   
       }
 
       $response->getBody()->write($payload);
@@ -175,21 +270,32 @@ class MesaController extends Mesa implements IApiUsable
 
     public function TraerMesasConFacturaMenor($request, $response, $args)
     {
-      $payload = "No hay ninguna mesa dada de alta";
-      $minimo = Pedido::ObtenerMenorRecaudacion();
-      $pedidosMenorRecaudacion = Pedido::RetornarPedidosPorRecaudacion($minimo);
-      $mesasFacturaMenor = Mesa::RetornarMesasAsignadasAPedidos($pedidosMenorRecaudacion);
-      $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
 
-      if($mesasFacturaMenor != false && count($mesasFacturaMenor) > 0 && $pedidosMenorRecaudacion != false && count($pedidosMenorRecaudacion) > 0)
+      if($formatoFecha)
       {
-        $minimo = number_format($minimo, 2, '.', '');
-        count($mesasFacturaMenor) > 1 ? $payload = "Las mesas que tuvieron la factura menor fueron <br><br>"
-        : $payload = "La mesa que tuvo la factura menor fue <br><br>";
-        $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMenor);
-        $payload .= "<br>La factura fue de $$minimo<br>";
+        $listaMesas = Mesa::ObtenerTodasLasMesas();
+        $listaPedidos = Pedido::TraerPedidosPorFecha($fechaInicio,$fechaFinal);
+        $minimo = Pedido::ObtenerMenorRecaudacion($listaPedidos);
+        $pedidosMenorRecaudacion = Pedido::RetornarPedidosPorRecaudacion($listaPedidos,$minimo);
+        $mesasFacturaMenor = Mesa::RetornarMesasAsignadasAPedidos($pedidosMenorRecaudacion,$listaMesas);
 
-        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura más barata");
+        if($mesasFacturaMenor != false && count($mesasFacturaMenor) > 0 && $pedidosMenorRecaudacion != false && count($pedidosMenorRecaudacion) > 0)
+        {
+          $minimo = number_format($minimo, 2, '.', '');
+          count($mesasFacturaMenor) > 1 ? $payload = "Las mesas que tuvieron la factura menor fueron <br><br>"
+          : $payload = "La mesa que tuvo la factura menor fue <br><br>";
+          $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMenor);
+          $payload .= "<br>La factura fue de $$minimo<br>";
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura más barata");
+        }
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";  
       }
 
       $response->getBody()->write($payload);
@@ -201,30 +307,36 @@ class MesaController extends Mesa implements IApiUsable
     {
         // Buscamos mesa por id
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
-
         $mesaCodigo = $args['codigoMesa'];
         $parametros = $request->getParsedBody();
-
         $fechaInicio = $parametros["fechaInicio"];
         $fechaFinal = $parametros["fechaFinal"];
-
+        $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
         $mesa = Mesa::ObtenerMesa($mesaCodigo);
+        $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
 
-        $payload = json_encode(array("mensaje" => "La mesa no existe"));
-
-        if($mesa != false)
+        if($formatoFecha)
         {
-            $payload = json_encode("La mesa con código $mesa->codigo no facturo nada entre el $fechaInicio hasta el $fechaFinal ");                          
+          $payload = json_encode(array("mensaje" => "Las fechas están vacias"));
 
-            $facturacion = Mesa::ObtenerFacturacionMesaPorFecha($mesa->GetCodigo(),$fechaInicio,$fechaFinal)[0];
+          if($fechaFinal != "" && $fechaInicio != "")
+          {
+            $payload = json_encode(array("mensaje" => "La mesa no existe"));
 
-            if(isset($facturacion) && is_float($facturacion))
+            if($mesa != false)
             {
-              $facturacion = number_format($facturacion, 2, '.', '');
-              $payload = json_encode("La mesa con código $mesa->codigo facturo $$facturacion entre el $fechaInicio hasta el $fechaFinal ");                          
+                $payload = json_encode("La mesa con código $mesa->codigo no facturo nada entre el $fechaInicio hasta el $fechaFinal ");                          
+    
+                $facturacion = Mesa::ObtenerFacturacionMesaPorFecha($mesa->GetCodigo(),$fechaInicio,$fechaFinal)[0];
+    
+                if(isset($facturacion) && is_float($facturacion))
+                {
+                  $facturacion = number_format($facturacion, 2, '.', '');
+                  $payload = json_encode("La mesa con código $mesa->codigo facturo $$facturacion entre el $fechaInicio hasta el $fechaFinal ");                          
+                }
+                Logs::AgregarLogOperacion($usuarioLoguado,"pidio la facturación de la mesa con código $mesa->codigo entre las fechas $fechaInicio y $fechaFinal");
             }
-            Logs::AgregarLogOperacion($usuarioLoguado,"pidio la facturación de la mesa con código $mesa->codigo entre las fechas $fechaInicio y $fechaFinal");
-
+          }
         }
 
         $response->getBody()->write($payload);
@@ -232,11 +344,10 @@ class MesaController extends Mesa implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
 
-    public function TraerMejoresComentarios($request, $response, $args)
+    public function TraerMejoresComentariosPorMesa($request, $response, $args)
     {
         // Buscamos mesa por id
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
-
         $mesaCodigo = $args['codigoMesa'];
         $mesa = Mesa::ObtenerMesa($mesaCodigo);
 
@@ -260,7 +371,7 @@ class MesaController extends Mesa implements IApiUsable
           ->withHeader('Content-Type', 'application/json');
     }
     
-    public function TraerPeoresComentarios($request, $response, $args)
+    public function TraerPeoresComentariosPorMesa($request, $response, $args)
     {
         // Buscamos mesa por id
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
@@ -349,7 +460,14 @@ class MesaController extends Mesa implements IApiUsable
               if($mesa->GetEstado() > -1 || $usuarioLoguado->GetTipo() == "socio")
               {
                 Mesa::CambiarEstadoMesa($mesa,$estadoInt);
+
                 $payload = json_encode(array("mensaje" => "El estado de la mesa se modifico con exito y paso a ser " . $estado));          
+
+                if($estadoInt == PAGANDO)
+                {
+                  $payload = json_encode(array("mensaje" => "Mesa cobrada con éxito. El socio debe cerrar la mesa ahora"));          
+                }
+
                 Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado de la mesa con código $mesa->codigo a $estado ");
                 $response->withStatus(200);
               }
@@ -383,6 +501,7 @@ class MesaController extends Mesa implements IApiUsable
       return $usuario;
     
     }
+    
 
 
     

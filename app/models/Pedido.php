@@ -14,11 +14,10 @@ require_once "./db/AccesoDatos.php";
 require_once "Archivos.php";
 require_once "Producto.php";
 define('CANCELADO',-2);
-define('ENPREPARACION',-1);
-define('PENDIENTE',0);
+define('PENDIENTE',-1);
+define('ENPREPARACION',0);
 define('TERMINADO',1);
-
-
+define('ENTREGADO',2);
 
 class Pedido
 {
@@ -169,13 +168,34 @@ class Pedido
 		$retorno=-1;
 		$mesa = Mesa::ObtenerMesa($pedido->GetCodigoMesa());
 		$usuario = Usuario::ObtenerUsuario($pedido->GetIDUsuario());
-		if(!(is_null($pedido->GetHoraFinal()) || is_null($pedido->GetHoraInicio()) || is_null($pedido->GetCodigo()) || is_null($pedido->GetEstado())))
+		if(!(is_null($pedido->GetCodigo()) || is_null($pedido->GetEstado())))
 		{
 			$retorno=0;//Si no está dada de alta la mesa, el producto o el usuario.
 			if($mesa != false && $usuario != false)
 			{
 				$retorno=1;
 				$pedido->AgregarPedidoDatabase();
+			}
+		}
+
+		return $retorno;
+	}
+
+	public static function ServirPedido($listaPedidos,$listaMesas,$pedido,$mesa)
+	{
+		$retorno=-1;//No hay pedidos terminados asignados al mozo
+		if(count($listaPedidos) > 0) 
+		{
+			$retorno = 0;// La mesa está cerrada o el pedido seleccionado no está terminado o no pertenece al mozo
+			if(count($listaMesas) > 0 && $pedido != false && $mesa != false && $mesa->GetEstado != "CERRADA")
+			{
+				$pedido->SetEstado(ENTREGADO);
+				$mesa->SetEstado(COMIENDO);
+				//Cambiar estados de pedidos y productos
+				//Asignar tiempo de entrega de pedido
+				$pedido->ModificarEstadoDatabase();
+				$mesa->CambiarEstadoMesaDatabase($mesa->GetEstado());
+				$retorno = 1;//El pedido fue servido
 			}
 		}
 
@@ -261,45 +281,47 @@ class Pedido
 		return $retorno;
 	}
 
-	public static function ObtenerMayorRecaudacion()
+	public static function ObtenerMayorRecaudacion($listaPedidos)
 	{
-		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
 		$maximo = false;
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
-
-			if($recaudacion > $maximo || $maximo == false)
+			if($pedido->GetEstado()==ENTREGADO)
 			{
-				$maximo = $recaudacion;
+				$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
+
+				if($recaudacion > $maximo || $maximo == false)
+				{
+					$maximo = $recaudacion;
+				}
 			}
 		}
 
 		return $maximo;
 	}
 
-	public static function ObtenerMenorRecaudacion()
+	public static function ObtenerMenorRecaudacion($listaPedidos)
 	{
-		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
 		$minimo = false;
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
-
-			if($recaudacion < $minimo || $minimo == false)
+			if($pedido->GetEstado()==ENTREGADO)
 			{
-				$minimo = $recaudacion;
+				$recaudacion = Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
+				if($recaudacion < $minimo || $minimo == false)
+				{
+					$minimo = $recaudacion;
+				}
 			}
 		}
 
 		return $minimo;
 	}
 
-	public static function RetornarPedidosPorRecaudacion($recaudacion)
+	public static function RetornarPedidosPorRecaudacion($listaPedidos,$recaudacion)
 	{
-		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
 		$pedidos = false;
 
 		if(isset($recaudacion) && is_numeric($recaudacion))
@@ -362,21 +384,25 @@ class Pedido
 			$retorno.=("<td>".$pedido->GetCodigo()."</td>");
 			$retorno.=("<td>".$usuario->GetNombre() . " ". $usuario->GetApellido() ."</td>");
 			$retorno.=("<td>".$pedido->GetCodigoMesa()."</td>");
-			
-			$retorno.=("<td>".$pedido->CalcularTiempoDePreparacion()."</td>");
-			
-			if($pedido->GetEstado() == CANCELADO)
+
+			if($pedido->GetEstado() != ENPREPARACION)
 			{
-				$tiempoRestante = "El pedido fue cancelado";
-			}
-			else
-			{
-				$pedido->VerificarSiTerminoElPedido() 
-				? $tiempoRestante = "Terminado"
-				: $tiempoRestante = $pedido->CalcularTiempoDeRestante();
+				$retorno.=("<td>".$pedido->CalcularTiempoDePreparacion()."</td>");
+			
+				if($pedido->GetEstado() == CANCELADO)
+				{
+					$tiempoRestante = "El pedido fue cancelado";
+				}
+				else
+				{
+					$pedido->VerificarSiTerminoElPedido() 
+					? $tiempoRestante = "Terminado"
+					: $tiempoRestante = $pedido->CalcularTiempoDeRestante();
+				}
+				
+				$retorno.=("<td>".$tiempoRestante."</td>");
 			}
 			
-			$retorno.=("<td>".$tiempoRestante."</td>");
 			$retorno.=("</tr>");
 		}
 
@@ -435,6 +461,12 @@ class Pedido
 		{
 			$retorno=("<table>");
 			$retorno.=("<th>[Pedido Codigo]</th><th>[Atendio]</th><th>[Mesa Codigo]</th><th>[Tiempo de Preparación Aproximado]</th><th>[Tiempo Restante Aproximado]</th>");
+			
+			if($estado == ENPREPARACION)
+			{
+				$retorno.=("<th>[Pedido Codigo]</th><th>[Atendio]</th><th>[Mesa Codigo]</th>");
+			}
+			
 			foreach($listaPedidos as $pedido)
 			{
 				if($pedido->GetEstado() == $estado)
@@ -473,15 +505,19 @@ class Pedido
 	{
 		switch($estado)
 		{
+			case "entregado":
+				return 2;
+			break;
+
 			case "terminado":
 				return 1;
 			break;
 			
-			case "pendiente":
+			case "enpreparacion":
 				return 0;
 			break;
 			
-			case "enpreparacion":
+			case "pendiente":
 				return -1;
 			break;
 
@@ -493,6 +529,20 @@ class Pedido
 				return -3;
 			break;
 		}
+	}
+
+	public static function TraerPedidosPorFecha($fecha1,$fecha2)
+	{
+        if($fecha1 == "" && $fecha2 == "")
+        {
+          $listaPedidos = Pedido::ObtenerTodosLosPedidos();
+        }
+        else
+        {
+          $listaPedidos = Pedido::ObtenerTodosLosPedidosPorFecha($fecha1,$fecha2);
+        }
+
+		return $listaPedidos;
 	}
 
 	public function CalcularTiempoDePreparacion()
@@ -533,7 +583,7 @@ class Pedido
 		{
 			foreach ($listaEstados as $estado) 
 			{
-				if($estado->estado != TERMINADO)
+				if($estado->estado != TERMINADO && $estado->estado != ENTREGADO)
 				{
 					return false;
 				}
@@ -599,11 +649,53 @@ class Pedido
         return $retorno;
     }
 
+    public static function ObtenerTodosLosPedidosPorEmpleado($idEmpleado)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE idUsuario = $idEmpleado");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+		}
+
+        return $retorno;
+    }
+
+	public static function ObtenerTodosLosPedidosPorFecha($fecha1,$fecha2)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE horaFinal BETWEEN '$fecha1 00:00:00' AND '$fecha2 23:59:59'");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+		}
+
+        return $retorno;
+    }
+
 	public static function ObtenerTodosLosPedidosQueNoLlegaronATiempo()
     {
 		$retorno=array();
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE codigo IN (SELECT DISTINCT p.codigo FROM pedidos p INNER JOIN pedprod pp ON pp.codigoPedido = p.codigo AND pp.horaFinal > p.horaFinal);");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE codigo IN (SELECT DISTINCT p.codigo FROM pedidos p INNER JOIN pedprod pp ON pp.codigoPedido = p.codigo AND p.horaFinal > pp.horaFinal);");
+		
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+		}
+
+        return $retorno;
+    }
+
+	public static function ObtenerTodosLosPedidosQueNoLlegaronATiempoEntreDosFechas($fecha1,$fecha2)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE codigo IN (SELECT DISTINCT p.codigo FROM pedidos p INNER JOIN pedprod pp ON pp.codigoPedido = p.codigo AND p.horaFinal > pp.horaFinal AND p.horaFinal BETWEEN '$fecha1 00:00:00' AND '$fecha2 23:59:59');");
 		
 		if($consulta->execute())
 		{

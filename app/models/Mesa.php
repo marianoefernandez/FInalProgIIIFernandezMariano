@@ -173,14 +173,13 @@ class Mesa
 		}
 	}
 
-	public function ContarPedidos()
+	public function ContarPedidos($listaPedidos)
 	{
-		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
 		$contador = 0;
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			if($pedido->GetCodigoMesa() == $this->GetCodigo() && $pedido->GetEstado() == 1)
+			if($pedido->GetCodigoMesa() == $this->GetCodigo() && $pedido->GetEstado() == 2)
 			{
 				$contador++;
 			}
@@ -189,14 +188,13 @@ class Mesa
 		return $contador;
 	}
 
-	public function AcumularRecaudacionMesa()
+	public function AcumularRecaudacionMesa($listaPedidos)
 	{
-		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
 		$acumulador = 0;
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			if($pedido->GetCodigoMesa() == $this->GetCodigo() && $pedido->GetEstado() == 1)
+			if($pedido->GetCodigoMesa() == $this->GetCodigo() && $pedido->GetEstado() == 2)
 			{
 				$acumulador+= Pedido::ObtenerValorTotalPedido($pedido->GetCodigo())[0];
 			}
@@ -210,14 +208,13 @@ class Mesa
 		return $acumulador;
 	}
 
-	public static function ObtenerMayorRecaudacionPorMesa()
+	public static function ObtenerMayorRecaudacionPorMesa($listaPedidos,$listaMesas)
 	{
-		$listaMesas = Mesa::ObtenerTodasLasMesas();
 		$maximo = false;
 
 		foreach ($listaMesas as $mesa) 
 		{
-			$acumulador = $mesa->AcumularRecaudacionMesa();
+			$acumulador = $mesa->AcumularRecaudacionMesa($listaPedidos);
 
 			if($acumulador > $maximo || $maximo == false)
 			{
@@ -228,14 +225,13 @@ class Mesa
 		return $maximo;
 	}
 
-	public static function ObtenerMenorRecaudacionPorMesa()
+	public static function ObtenerMenorRecaudacionPorMesa($listaPedidos,$listaMesas)
 	{
-		$listaMesas = Mesa::ObtenerTodasLasMesas();
 		$minimo = false;
 
 		foreach ($listaMesas as $mesa) 
 		{
-			$acumulador = $mesa->AcumularRecaudacionMesa();
+			$acumulador = $mesa->AcumularRecaudacionMesa($listaPedidos);
 
 			if($acumulador < $minimo || $minimo == false)
 			{
@@ -246,14 +242,13 @@ class Mesa
 		return $minimo;
 	}
 
-	public static function ObtenerMayorCantidadPedidosPorMesa()
+	public static function ObtenerMayorCantidadPedidosPorMesa($listaPedidos,$listaMesas)
 	{
-		$listaMesas = Mesa::ObtenerTodasLasMesas();
 		$maximo = false;
 
 		foreach ($listaMesas as $mesa) 
 		{
-			$contador = $mesa->ContarPedidos();
+			$contador = $mesa->ContarPedidos($listaPedidos);
 
 			if($contador > $maximo || $maximo == false)
 			{
@@ -264,14 +259,13 @@ class Mesa
 		return $maximo;
 	}
 
-	public static function ObtenerMenorCantidadPedidosPorMesa()
+	public static function ObtenerMenorCantidadPedidosPorMesa($listaPedidos,$listaMesas)
 	{
-		$listaMesas = Mesa::ObtenerTodasLasMesas();
 		$minimo = false;
 
 		foreach ($listaMesas as $mesa) 
 		{
-			$contador = $mesa->ContarPedidos();
+			$contador = $mesa->ContarPedidos($listaPedidos);
 
 			if($contador < $minimo || $minimo == false)
 			{
@@ -282,9 +276,25 @@ class Mesa
 		return $minimo;
 	}
 
-	public static function RetornarMesasPorCantidadPedidos($cantidad)
+	public static function OrdenarMesasPorRecaudacion($fechaInicio,$fechaFinal)
 	{
-		$listaMesas = Mesa::ObtenerTodasLasMesas();
+		$existeFecha = ($fechaInicio != "" && $fechaFinal != "");
+
+		if($existeFecha)
+		{
+			$retorno = Producto::ObtenerTodosLosProductosOrdenadosPorCantidadEntreDosFechas($fechaInicio,$fechaFinal,"DESC");
+		}
+		else
+		{
+			$retorno = Producto::ObtenerTodosLosProductosOrdenadosPorCantidad("DESC");
+		}
+
+		return $retorno;
+    }
+
+
+	public static function RetornarMesasPorCantidadPedidos($listaPedidos, $listaMesas,$cantidad)
+	{
 		$mesas = false;
 
 		if(isset($cantidad) && is_numeric($cantidad))
@@ -292,7 +302,7 @@ class Mesa
 			$mesas = array();
 			foreach ($listaMesas as $mesa) 
 			{
-				$contador = $mesa->ContarPedidos();
+				$contador = $mesa->ContarPedidos($listaPedidos);
 
 				if($contador == $cantidad)
 				{
@@ -304,10 +314,9 @@ class Mesa
 		return $mesas;
 	}
 
-	public static function RetornarMesasAsignadasAPedidos($listaPedidos)
+	public static function RetornarMesasAsignadasAPedidos($listaPedidos,$listaMesas)
 	{
 		$mesas = false;
-		$listaMesas = Mesa::ObtenerTodasLasMesas();
 
 		if(isset($listaPedidos) && count($listaPedidos) > 0 && count($listaMesas) > 0)
 		{
@@ -330,7 +339,7 @@ class Mesa
 
 		foreach ($listaPedidos as $pedido) 
 		{
-			if($codigoMesa == $pedido->GetCodigoMesa() && $pedido->GetEstado() == 1)
+			if($codigoMesa == $pedido->GetCodigoMesa() && $pedido->GetEstado() == 2)
 			{
 				$retorno = 1;
 				break;
@@ -340,9 +349,8 @@ class Mesa
 		return $retorno;
 	}
 
-	public static function RetornarMesasPorRecaudacion($recaudacion)
+	public static function RetornarMesasPorRecaudacion($listaPedidos,$listaMesas,$recaudacion)
 	{
-		$listaMesas = Mesa::ObtenerTodasLasMesas();
 		$mesas = false;
 
 		if(isset($recaudacion) && is_numeric($recaudacion))
@@ -350,7 +358,7 @@ class Mesa
 			$mesas = array();
 			foreach ($listaMesas as $mesa) 
 			{
-				$acumulador = $mesa->AcumularRecaudacionMesa();
+				$acumulador = $mesa->AcumularRecaudacionMesa($listaPedidos);
 
 				if($acumulador == $recaudacion)
 				{
@@ -361,6 +369,22 @@ class Mesa
 
 		return $mesas;
 	}
+
+	public static function ObtenerMesasOrdenadasPorRecaudacion($fechaInicio,$fechaFinal)
+	{
+		$existeFecha = ($fechaInicio != "" && $fechaFinal != "");
+
+		if($existeFecha)
+		{
+			$retorno = Mesa::ObtenerTodasLasMesasOrdenadasPorRecaudacionEntreDosFechas($fechaInicio,$fechaFinal,"DESC");
+		}
+		else
+		{
+			$retorno = Mesa::ObtenerTodasLasMesasOrdenadasPorRecaudacion("DESC");
+		}
+
+		return $retorno;
+    }
 
 	public static function CrearCodigoAlfaNumerico()
 	{
@@ -435,11 +459,38 @@ class Mesa
 		return $retorno;
 	}
 
+	public function RetornarInfoDeMesaString()
+	{
+		$estadoText = "Cerrada";
+
+		$retorno=("<td>".$this->GetCodigo()."</td>");
+
+		switch($this->GetEstado())
+		{
+			case 0:
+				$estadoText = "Esperando";
+				break;
+
+			case 1:
+				$estadoText = "Comiendo";
+				break;
+
+			case 2:
+				$estadoText = "Pagando";
+				break;
+		}
+
+		$retorno.=("<td>".$estadoText."</td>");
+		$retorno.=("<td>".$this->GetFechaDeCreacion()."</td>");
+
+		return $retorno;
+	}
+
+
 	public static function RetornarListaDeMesasString($listaMesas)
 	{
 		$len = count($listaMesas);
 		$retorno="<h1>No hay mesas dadas de altaa<h1>";
-		$estadoText = "Cerrada";
 
 		if($len>0)
 		{
@@ -448,25 +499,7 @@ class Mesa
 			foreach($listaMesas as $mesa)
 			{
 				$retorno.=("<tr align='center'>");
-				$retorno.=("<td>".$mesa->GetCodigo()."</td>");
-
-				switch($mesa->GetEstado())
-				{
-					case 0:
-						$estadoText = "Esperando";
-						break;
-
-					case 1:
-						$estadoText = "Comiendo";
-						break;
-
-					case 2:
-						$estadoText = "Pagando";
-						break;
-				}
-
-				$retorno.=("<td>".$estadoText."</td>");
-				$retorno.=("<td>".$mesa->GetFechaDeCreacion()."</td>");
+				$retorno.=$mesa->RetornarInfoDeMesaString();
 				$retorno.=("</tr>");
 			}
 			$retorno.=("</table>");
@@ -474,6 +507,32 @@ class Mesa
 
 		return $retorno;
     }
+
+	public static function RetornarListaDeMesasConRecaudacionString($listaMesas,$fechaInicio,$fechaFinal)
+	{
+		$len = count($listaMesas);
+		$retorno="<h1>No hay mesas en la lista<h1>";
+		$tieneFecha = ($fechaInicio != "" && $fechaFinal != "");
+
+		if($len>0)
+		{
+			$retorno=("<table>");
+			$retorno.=("<th>[Codigo]</th><th>[Estado]</th><th>[Fecha de Creación]</th><th>[Recaudación]</th>");
+			foreach($listaMesas as $mesa)
+			{
+				$retorno.=("<tr align='center'>");
+				$retorno.=$mesa->RetornarInfoDeMesaString();
+				$tieneFecha ? $listaPedidos = Pedido::ObtenerTodosLosPedidosPorFecha($fechaInicio,$fechaFinal) :
+				$listaPedidos = Pedido::ObtenerTodosLosPedidos();
+				$retorno.=("<td>$ ".$mesa->AcumularRecaudacionMesa($listaPedidos)."</td>");
+				$retorno.=("</tr>");
+			}
+			$retorno.=("</table>");
+		}
+
+		return $retorno;
+    }
+	
 
 	
 	public static function RetornarListaComentarios($listaComentarios)
@@ -532,6 +591,37 @@ class Mesa
         return $retorno;
     }
 
+	public static function ObtenerTodasLasMesasOrdenadasPorRecaudacion($condicion)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta
+		("SELECT m.codigo,m.estado,m.fechaDeCreacion, SUM(pp.precio) FROM mesas m LEFT JOIN pedidos p ON p.codigoMesa = m.codigo LEFT JOIN pedprod pp ON p.codigo = pp.codigoPedido AND p.estado = 2;
+		GROUP BY m.codigo
+		ORDER BY SUM(pp.precio) $condicion;");
+       	if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+	   	}
+        return $retorno;
+    }
+
+	public static function ObtenerTodasLasMesasOrdenadasPorRecaudacionEntreDosFechas($fecha1,$fecha2,$condicion)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta
+		("SELECT m.codigo,m.estado,m.fechaDeCreacion, SUM(pp.precio) FROM mesas m LEFT JOIN pedidos p ON p.codigoMesa = m.codigo LEFT JOIN pedprod pp ON p.codigo = pp.codigoPedido AND p.estado = 2
+		AND p.horaFinal BETWEEN '$fecha1 00:00:00' AND '$fecha2 23:59:59'
+		GROUP BY m.codigo
+		ORDER BY SUM(pp.precio) $condicion;");       	
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+	   	}
+        return $retorno;
+    }
+
     public static function ObtenerMesa($codigo)
     {
 		$retorno=false;
@@ -551,7 +641,7 @@ class Mesa
 	{
 		$retorno=false;
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT SUM(precio) FROM pedprod p INNER JOIN pedidos ped ON ped.codigo = p.codigoPedido WHERE ped.codigoMesa = '$codigoMesa' AND p.horaFinal BETWEEN '$fecha1' AND '$fecha2' AND p.estado = 1;");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT SUM(precio) FROM pedprod p INNER JOIN pedidos ped ON ped.codigo = p.codigoPedido WHERE ped.codigoMesa = '$codigoMesa' AND p.horaFinal BETWEEN '$fecha1' AND '$fecha2' AND ped.estado = 2;");
 
 		if($consulta->execute())
 		{
@@ -560,18 +650,6 @@ class Mesa
 
         return $retorno;
 	}
-
-	public static function ObtenerMejoresOPeoresComentariosPorMesa($codigoMesa,$filtro)
-	{
-		$retorno=array();
-        $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,codigoPedido,notaMesa,notaRestaurante,notaMozo,notaCocinero,comentario FROM calificaciones WHERE codigoMesa = '$codigoMesa' AND notaMesa = (SELECT $filtro(notaMesa) FROM calificaciones);");
-       	if($consulta->execute())
-		{
-			$retorno = $consulta->fetchAll(PDO::FETCH_OBJ);
-	   	}
-        return $retorno;
-	}	
 }
 
 ?>

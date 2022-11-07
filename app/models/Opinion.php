@@ -341,6 +341,18 @@ class Opinion
 	   	}
         return $retorno;
 	}	
+
+	public static function ObtenerMejoresOPeoresComentarios($filtroUno,$filtroDos)
+	{
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,codigoPedido,notaMesa,notaRestaurante,notaMozo,notaCocinero,comentario FROM calificaciones WHERE $filtroUno = (SELECT $filtroDos($filtroUno) FROM calificaciones);");
+       	if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_OBJ);
+	   	}
+        return $retorno;
+	}	
 }
 
 ?>

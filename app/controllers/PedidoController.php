@@ -3,6 +3,7 @@ require_once '../app/models/Pedido.php';
 require_once '../app/models/Producto.php';
 require_once '../app/models/Usuario.php';
 require_once '../app/models/Logs.php';
+require_once '../app/models/Validaciones.php';
 require_once '../app/interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
 require_once 'UsuarioController.php';
@@ -22,12 +23,13 @@ class PedidoController extends Pedido implements IApiUsable
         $parametros = $request->getParsedBody();
 
         $codigoMesa = $parametros['codigoMesa'];
-        $tiempoDePedido = $parametros['tiempoAproximado'];//Segundos
+        //$tiempoDePedido = $parametros['tiempoAproximado'];//Segundos
 
         $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
 
         //Creamos el pedido
-        $pedido = Pedido::ConstruirPedido($codigoMesa,$usuarioLoguado->GetID(),date("Y-m-j H:i:s"),date("Y-m-j H:i:s",time() + $tiempoDePedido));
+        //$pedido = Pedido::ConstruirPedido($codigoMesa,$usuarioLoguado->GetID(),date("Y-m-j H:i:s"),date("Y-m-j H:i:s",time() + $tiempoDePedido));
+        $pedido = Pedido::ConstruirPedido($codigoMesa,time(),NULL);
 
         switch(Pedido::AltaPedido($pedido))
         {
@@ -141,16 +143,33 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function TraerTodos($request, $response, $args)
     {
-        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
-        $listaPedidos = Pedido::ObtenerTodosLosPedidos();
-        $filtro = $args['filtro'];
-        $filtro = strtolower($filtro);
-        $estadoInt = Pedido::ObtenerEstadoInt($filtro);
-        //$payload = json_encode(array("listaUsuario" => $lista));
-        $payload = json_encode(array("mensaje" => "No ingreso un estado válido"));
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));        
+      $listaPedidos = Pedido::ObtenerTodosLosPedidos();
+      $filtro = $args['filtro'];
+      $filtro = strtolower($filtro);
+      $estadoInt = Pedido::ObtenerEstadoInt($filtro);
+      //$payload = json_encode(array("listaUsuario" => $lista));
 
+      if($formatoFecha)
+      {
+        $payload = json_encode(array("mensaje" => "No se ingreso un estado válido"));
+        
         if($estadoInt != -3)
         {
+          if($fechaInicio == "" && $fechaFinal == "")
+          {
+            $listaPedidos = Pedido::ObtenerTodosLosPedidos();
+          }
+          else
+          {
+            $listaPedidos = Pedido::ObtenerTodosLosPedidosPorFecha($fechaInicio,$fechaFinal);
+          }
+
           $payload = Pedido::RetornarListaDePedidosString($listaPedidos,$estadoInt); 
           if($payload != false)
           {            
@@ -160,28 +179,101 @@ class PedidoController extends Pedido implements IApiUsable
           {
             $payload = "<h1>No hay ningun pedido en estado $filtro<h1>";
           }
+          $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+          : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
         }
 
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'text/html');
+      }
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');
+    }
+
+    public function TraerPedidosListos($request, $response, $args)
+    {
+      $usuarioLogueado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $listaPedidos = Pedido::ObtenerTodosLosPedidosPorEmpleado($usuarioLogueado->GetID());      
+      $payload = Pedido::RetornarListaDePedidosString($listaPedidos,TERMINADO); 
+      if($payload != false)
+      {            
+        $payload .= "Todos los pedidos terminados atendidos por usted $usuarioLogueado->nombre $usuarioLogueado->apellido";
+        Logs::AgregarLogOperacion($usuarioLogueado,"trajo los pedidos listos para servir de su propiedad");
+      }
+      else
+      {
+        $payload = json_encode(array("mensaje" => "No hay ningun pedido listo para servir para el mozo $usuarioLogueado->nombre $usuarioLogueado->apellido"));
+      }
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');    
+    }
+
+    public function ServirUnPedido($request, $response, $args)
+    {
+      $parametros = $request->getParsedBody();
+      $codigoPedido = $parametros['codigoPedido'];
+      $codigoMesa = $parametros['codigoMesa'];
+      $usuarioLogueado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $pedido = Pedido::ObtenerPedido($codigoPedido);
+      $mesa = Mesa::ObtenerMesa($codigoMesa);
+      $listaPedidos = Pedido::ObtenerTodosLosPedidosPorEmpleado($usuarioLogueado->GetID());      
+      $listaMesas = Mesa::ObtenerTodasLasMesas();      
+      $payload = json_encode(array("mensaje" => "La mesa o el pedido no existen o no se encuentran listos para servir"));
+
+      if($mesa != false && $pedido != false)
+      {
+        switch(Pedido::ServirPedido($listaPedidos,$listaMesas,$pedido,$mesa))
+        {
+          case -1:
+            $payload = json_encode(array("mensaje" => "No hay pedidos terminados asignados al mozo"));
+            break;
+
+          case 0:
+            $payload = json_encode(array("mensaje" => "La mesa está cerrada o el pedido seleccionado no está terminado o no pertenece al mozo"));
+            break;
+
+          case 1:
+            $payload = json_encode(array("mensaje" => "Pedido servido con éxito"));
+            Logs::AgregarLogOperacion($usuarioLogueado,"Sirvio exitosamente el pedido con el codigo $pedido->codigo");
+            break;
+        }
+      }
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');    
     }
     
     public function TraerLoQueMasVendio($request, $response, $args)
     {
-      $payload = "No hay productos dados de alta";
-      $maximo = Producto::ObtenerCantidadVendidosProductoMayor();
-      $productosMasVendidos = Producto::RetornarProductosPorCantidadDeVentas($maximo);
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $listaProductos = Producto::ObtenerTodosLosProductos();
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
 
-      if($productosMasVendidos != false && count($productosMasVendidos) > 0)
+      if($formatoFecha)
       {
-        count($productosMasVendidos) > 1 ? $payload = "Los productos más vendidos fueron <br><br>"
-        : $payload = "El producto más vendido fue <br><br>";
-        $payload .= Producto::RetornarListaDeProductosString($productosMasVendidos);
-        $payload .= "<br>La cantidad vendida fue de $maximo unidades<br>";
+        $payload = json_encode(array("mensaje" => "No hay ningun pedido o producto en la lista"));
+        $maximo = Producto::ObtenerCantidadVendidosProductoMayor($listaProductos,$fechaInicio,$fechaFinal);
+        $productosMasVendidos = Producto::RetornarProductosPorCantidadDeVentas($listaProductos,$fechaInicio,$fechaFinal,$maximo);
 
-        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos más vendidos");
+        if($productosMasVendidos != false && count($productosMasVendidos) > 0)
+        {
+          count($productosMasVendidos) > 1 ? $payload = "Los productos más vendidos fueron <br><br>"
+          : $payload = "El producto más vendido fue <br><br>";
+          $payload .= Producto::RetornarListaDeProductosString($productosMasVendidos,"","");
+          $payload .= "<br>La cantidad vendida fue de $maximo unidades<br>";
+  
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos más vendidos");
+        }
+        
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
       }
 
       $response->getBody()->write($payload);
@@ -191,19 +283,31 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function TraerLoQueMenosVendio($request, $response, $args)
     {
-      $payload = "No hay productos dados de alta";
-      $minimo = Producto::ObtenerCantidadVendidosProductoMenor();
-      $productosMenosVendidos = Producto::RetornarProductosPorCantidadDeVentas($minimo);
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $listaProductos = Producto::ObtenerTodosLosProductos();
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
 
-      if($productosMenosVendidos != false && count($productosMenosVendidos) > 0)
+      if($formatoFecha)
       {
-        count($productosMenosVendidos) > 1 ? $payload = "Los productos menos vendidos fueron <br><br>"
-        : $payload = "El producto menos vendido fue <br><br>";
-        $payload .= Producto::RetornarListaDeProductosString($productosMenosVendidos);
-        $payload .= "<br>La cantidad vendida fue de $minimo unidades<br>";
+        $payload = json_encode(array("mensaje" => "No hay ningun pedido o producto en la lista"));
+        $minimo = Producto::ObtenerCantidadVendidosProductoMenor($listaProductos,$fechaInicio,$fechaFinal);
+        $productosMenosVendidos = Producto::RetornarProductosPorCantidadDeVentas($listaProductos,$fechaInicio,$fechaFinal,$minimo);
 
-        Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos menos vendidos");
+        if($productosMenosVendidos != false && count($productosMenosVendidos) > 0)
+        {
+          count($productosMenosVendidos) > 1 ? $payload = "Los productos menos vendidos fueron <br><br>"
+          : $payload = "El producto menos vendido fue <br><br>";
+          $payload .= Producto::RetornarListaDeProductosString($productosMenosVendidos,"","");
+          $payload .= "<br>La cantidad vendida fue de $minimo unidades<br>";
+  
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos menos vendidos");
+        }
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
       }
 
       $response->getBody()->write($payload);
@@ -213,18 +317,67 @@ class PedidoController extends Pedido implements IApiUsable
     
     public function TraerLosNoEntregadosATiempo($request, $response, $args)
     {
-        $listaPedidosNoEntregadosATiempo = Pedido::ObtenerTodosLosPedidosQueNoLlegaronATiempo();
-        $payload = Pedido::RetornarListaDePedidosString($listaPedidosNoEntregadosATiempo,TERMINADO);
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      
+      if($formatoFecha)
+      {
+        if($fechaInicio == "" && $fechaFinal == "")
+        {
+          $listaPedidosNoEntregadosATiempo = Pedido::ObtenerTodosLosPedidosQueNoLlegaronATiempo();
+        }
+        else
+        {
+          $listaPedidosNoEntregadosATiempo = Pedido::ObtenerTodosLosPedidosQueNoLlegaronATiempoEntreDosFechas($fechaInicio,$fechaFinal);
+        }
+
+        $payload = Pedido::RetornarListaDePedidosString($listaPedidosNoEntregadosATiempo,ENTREGADO);
         $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
         
         $payload != false ? Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los pedidos no entregados a tiempo")
         : $payload = "<h1>No hay ningun pedido que no sea haya entregado a tiempo<h1>";
+        
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
+      }
 
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'text/html');
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');
     }
 
+    public function TraerProductosMasVendidoAMenosVendido($request, $response, $args)
+    {
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+
+      if($formatoFecha)
+      {
+        $payload = json_encode(array("mensaje" => "No hay ningun producto en la lista"));
+        $listaProductos = Producto::ObtenerProductosOrdenadosPorCantidad($fechaInicio,$fechaFinal);
+
+        if($listaProductos != false && count($listaProductos) > 0)
+        {
+          $payload = Producto::RetornarListaDeProductosString($listaProductos,$fechaInicio,$fechaFinal);
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre todos los productos ordenados por cantidad de ventas");
+        }
+        
+        $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
+        : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
+      }
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');
+    }
     
     public function ModificarUno($request, $response, $args)
     {
