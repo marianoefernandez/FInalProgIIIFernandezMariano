@@ -173,7 +173,7 @@ class PedidoController extends Pedido implements IApiUsable
           $payload = Pedido::RetornarListaDePedidosString($listaPedidos,$estadoInt); 
           if($payload != false)
           {            
-            Logs::AgregarLogOperacion($usuarioLoguado,"trajo los pedidos en estado $filtro");
+            Logs::AgregarLogOperacion($usuarioLoguado,"trajo los productos de todos los pedidos en estado $filtro");
           }
           else
           {
@@ -208,6 +208,31 @@ class PedidoController extends Pedido implements IApiUsable
       $response->getBody()->write($payload);
       return $response
         ->withHeader('Content-Type', 'text/html');    
+    }
+
+    public function TraerTodosProductosPedidos($request, $response, $args)
+    {
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $listaPedidos = Pedido::ObtenerTodosLosPedidos();
+      $filtro = $args['filtro'];
+      $filtro = strtolower($filtro);
+      $estadoInt = Pedido::ObtenerEstadoInt($filtro);
+
+      $payload = json_encode(array("mensaje" => "No se ingreso un estado válido"));
+      
+      if($estadoInt != -3)
+      {
+        $payload = Pedido::RetornarListaDePedidosConProductosString($listaPedidos,$usuarioLoguado,$estadoInt);
+        if($payload == false)
+        {
+          $payload = "<h2>No hay productos para el estado $filtro<h2>";
+        }
+        $payload .= "<h3>Mostre todos los productos en estado $filtro que el usuario $usuarioLoguado->nombre $usuarioLoguado->apellido  puede ver<h3>";
+      }
+
+      $response->getBody()->write($payload);
+      return $response
+        ->withHeader('Content-Type', 'text/html');
     }
 
     public function ServirUnPedido($request, $response, $args)
@@ -377,6 +402,45 @@ class PedidoController extends Pedido implements IApiUsable
       $response->getBody()->write($payload);
       return $response
         ->withHeader('Content-Type', 'text/html');
+    }
+
+    public function CambiarEstadoUno($request, $response, $args)
+    {
+        $parametros = $request->getParsedBody();
+        $estado = $parametros['estado'];
+        $idProducto = $parametros['idProducto'];
+        $codigoPedido = $parametros['codigoPedido'];
+        $tiempoDePreparacion = $parametros['tiempoDePreparacion'];
+        $payload = json_encode(array("mensaje" => "No se pudo modificar el estado, revise que los datos ingresados sean correctos"));          
+        $response->withStatus(401);
+        $pedido = Pedido::ObtenerPedido($codigoPedido);
+        $producto = Producto::ObtenerProducto($idProducto);
+        $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
+
+        if($pedido != false && $producto != false && is_numeric($tiempoDePreparacion) && $tiempoDePreparacion > 0)
+        {
+          $payload = json_encode(array("mensaje" => "Hubo un error al modificar el estado del pedido se ingreso un dato invalido"));          
+
+          $estado = strtolower($estado);
+          $estadoInt = Pedido::ObtenerEstadoInt($estado);
+
+          if($estadoInt != -3)
+          {
+            $payload = json_encode(array("mensaje" => "No se modifico porque el estado del pedido ya estaba como " . $estado));          
+        
+            if($pedido->GetEstado() != $estadoInt)
+            {  
+              Producto::CambiarEstadoProductoPedido($pedido,$producto,$estadoInt);
+              $payload = json_encode(array("mensaje" => "Se modifico el estado exitosamente"));          
+              Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado del producto con id $producto->id perteneciente al pedido con código $pedido->codigo a $estado");
+              $response->withStatus(200);
+            }
+          }      
+        }
+
+        $response->getBody()->write($payload);
+        return $response
+          ->withHeader('Content-Type', 'application/json');
     }
     
     public function ModificarUno($request, $response, $args)

@@ -491,14 +491,75 @@ class Pedido
 		return $retorno;
     }
 
-	public static function RetornarUnPedidoConProductosString($pedido)
+	public static function RetornarUnPedidoConProductosString($listaProductos,$pedido,$usuario,$estado)
 	{
-		//A DESARROLLAR
+		$retorno = false;
+		$flag = 0;
+
+		if($pedido != false)
+		{
+			$retorno = "<h2>No hay ningun producto cargado a ese pedido o el estado del pedido es diferente a solicitado<h2>";
+
+			if(count($listaProductos) > 0)
+			{
+				$retorno = "<h2>Muestro los productos para el pedido $pedido->codigo <h2>";
+
+				$retorno.=("<table>");
+				$retorno.=("<th>[Id Producto]</th><th>[Nombre]</th><th>[Tipo]</th><th>[Rol]</th><th>[Precio]</th><th>[Cantidad]</th>");
+
+				foreach ($listaProductos as $producto) 
+				{
+					if(($usuario->GetRol() == $producto->GetRol() || $usuario->GetTipo() == "socio"))
+					{
+						$retorno.=("<tr align='center'>");
+						$retorno.=("<td>". $producto->id ."</td>");
+						$retorno .= Producto::RetornarUnProductoString($producto);
+						$retorno.=("<td>". Producto::CantidadVentasPedidoProducto($pedido->GetCodigo(),$producto->GetID(),$estado)."</td>");
+						$retorno.=("</tr>");
+						$flag = 1;
+					}
+				}
+				$retorno.=("</table>");
+			}
+		}
+
+		if($flag == 0)
+		{
+			$retorno = false;
+		}
+
+		return $retorno;
     }
 
-	public static function RetornarListaDePedidosConProductosString($listaPedidos,$estado)
+	public static function RetornarListaDePedidosConProductosString($listaPedidos,$usuario,$estado)
 	{
-		//A DESARROLLAR
+		$retorno = "<h2>No hay pedidos dados de alta en el sistema<h2>";
+		$flag = 0;
+
+		if(count($listaPedidos) > 0)
+		{
+			$retorno = "";
+			foreach ($listaPedidos as $pedido) 
+			{
+				if($pedido->GetEstado() == $estado)
+				{
+					$listaProductos = Producto::ObtenerTodosLosProductosPorPedido($pedido->GetCodigo(),$estado);
+					$retorno .= Pedido::RetornarUnPedidoConProductosString($listaProductos,$pedido,$usuario,$estado);
+					if($retorno != false)
+					{
+						$flag = 1;
+					}
+				}
+			}
+		}
+
+		if($flag == 0)
+		{
+			$retorno = false;
+		}
+
+		return $retorno;
+
     }
 
 	public static function ObtenerEstadoInt($estado)

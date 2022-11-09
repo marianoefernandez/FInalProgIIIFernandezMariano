@@ -148,7 +148,7 @@ $app->group('/mesas', function (RouteCollectorProxy $group)
     $group->get('/listarUna/{codigoMesa}',\MesaController::class . ':TraerUno')->add(new MWVerificar("empleado","mozo"));
     $group->delete('/borrarUna',\MesaController::class . ':BorrarUno')->add(new MWVerificar("socio","todos"));
     $group->put('/modificarUna',\MesaController::class . ':ModificarUno')->add(new MWVerificar("empleado","mozo"));
-    $group->put('/cambiarEstado/{codigoMesa}',\MesaController::class . ':CambiarEstadoUno');
+    $group->put('/cambiarEstado/{codigoMesa}',\MesaController::class . ':CambiarEstadoUno')->add(new MWVerificar("empleado","mozo"));
 
     //9-a La más usada.
     $group->get('/masUsada',\MesaController::class . ':TraerMesasMasUsadas')->add(new MWVerificar("socio","todos"));
@@ -223,6 +223,14 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
     //19- Alguno de los socios pide un listado del producto ordenado del que más se vendió 
     //al que menos se vendió.
     $group->get('/traerProductosMasVendidoAMenosVendido',\PedidoController::class . ':TraerProductosMasVendidoAMenosVendido')->add(new MWVerificar("socio","todos"));
+
+    //3-Listar todos los productos pendientes de este tipo de empleado.
+    //6-Listar todos los productos en preparacion de este tipo de empleado
+    $group->get('/traerProductosPedidos/{filtro}',\PedidoController::class . ':TraerTodosProductosPedidos')->add(new MWVerificar("empleado","todos"));
+    
+    //3-Debe cambiar el estado a “en preparación” y agregarle el tiempo de preparación
+    //6-Debe cambiar el estado a “listo para servir” .
+    $group->get('/cambiarEstadoProducto',\PedidoController::class . ':CambiarEstadoUno')->add(new MWVerificar("empleado","todos"));
 
 });
 

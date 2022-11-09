@@ -20,6 +20,7 @@ class Producto
 	public $rol;//A que rol pertence por ejemplo mozo/bartender/etc
     public $fechaDeCreacion;
 	public $precio;
+	public $cantidad;
 
 	//GETTERS
 
@@ -332,6 +333,26 @@ class Producto
 		return $retorno;
 	}
 
+	public static function RetornarUnProductoString($producto)
+	{
+		$retorno=false;
+
+		if($producto != false)
+		{
+			$retorno.=("<td>".$producto->GetNombre()."</td>");
+			$retorno.=("<td>".$producto->GetTipo()."</td>");
+			$retorno.=("<td>".$producto->GetRol()."</td>");
+			$retorno.=("<td>$".$producto->GetPrecio()."</td>");
+		}
+
+		return $retorno;
+    }
+
+	public static function CambiarEstadoProductoPedido($pedido,$producto,$estadoInt)
+	{	
+		$producto->CambiarEstadoProductoPedidoDatabase($pedido->GetCodigo(),$estadoInt);
+	}
+
 	public static function RetornarListaDeProductosString($listaProductos,$fecha1,$fecha2)
 	{
 		$len = count($listaProductos);
@@ -422,6 +443,21 @@ class Producto
         return $retorno;
     }
 
+	public static function ObtenerTodosLosProductosPorPedido($codigoPedido,$estado)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT p.id,p.nombre,p.tipo,p.rol,p.fechaDeCreacion,p.precio FROM productos p INNER JOIN pedprod pp ON pp.idProducto = p.id AND pp.codigoPedido = '$codigoPedido' AND pp.estado = $estado;");
+        $consulta->execute();
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Producto');
+		}
+
+        return $retorno;
+    }
+
 	public static function ObtenerTodosLosProductosOrdenadosPorCantidad($condicion)
     {
 		$retorno=array();
@@ -476,6 +512,31 @@ class Producto
 		}
 
         return $retorno;
+    }
+
+	public static function CantidadVentasPedidoProducto($codigoPedido,$idProducto,$estado)
+    {
+		$retorno=false;
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT pp.cantidad FROM pedprod pp WHERE pp.codigoPedido = '$codigoPedido' AND pp.idProducto = '$idProducto' AND estado = $estado;");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetch(PDO::FETCH_NUM);
+			$retorno = $retorno[0];
+		}
+
+        return $retorno;
+    }
+
+	public function CambiarEstadoProductoPedidoDatabase($codigoPedido,$estado)
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+
+       $consulta = $objetoAccesoDato->prepararConsulta(
+		"UPDATE pedprod SET estado = '$estado' WHERE codigoPedido = '$codigoPedido' AND idProducto = '$this->id'
+	   	LIMIT 1;");
+	   $consulta->execute();
     }
 
 	public function CantidadDeVentas()
