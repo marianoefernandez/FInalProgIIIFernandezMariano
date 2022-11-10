@@ -348,9 +348,26 @@ class Producto
 		return $retorno;
     }
 
-	public static function CambiarEstadoProductoPedido($pedido,$producto,$estadoInt)
-	{	
-		$producto->CambiarEstadoProductoPedidoDatabase($pedido->GetCodigo(),$estadoInt);
+	public static function CambiarEstadoProductoPedido($pedido,$producto,$estadoInt,$tiempoPreparacion)
+	{	$retorno = false;
+
+		if($producto->CambiarEstadoProductoPedidoDatabase($pedido->GetCodigo(),$estadoInt))
+		{
+			$producto->CalcularTiempoFinal($tiempoPreparacion,$pedido);
+			if(Pedido::VerificarEstado($pedido,$estadoInt))
+			{
+				$pedido->SetEstado($estadoInt);
+				$pedido->ModificarEstadoDatabase();
+			}
+			$retorno = true;
+		}
+
+		return $retorno;
+	}
+
+	public function CalcularTiempoFinal($tiempoPreparacion,$pedido)
+	{
+		$this->AsignarTiemposDatabase(date("Y-m-j H:i:s"),date("Y-m-j H:i:s",$tiempoPreparacion + time()),$pedido->GetCodigo());
 	}
 
 	public static function RetornarListaDeProductosString($listaProductos,$fecha1,$fecha2)
@@ -417,6 +434,15 @@ class Producto
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
 
        $consulta = $objetoAccesoDato->prepararConsulta("UPDATE productos SET nombre = '$this->nombre' , tipo = '$this->tipo', rol = '$this->rol', fechaDeCreacion = '$this->fechaDeCreacion', precio = '$this->precio' WHERE id = '$this->id' ");
+	   $consulta->execute();
+    }
+
+    public function AsignarTiemposDatabase($fecha1,$fecha2,$codigoPedido)
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+
+       $consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedprod SET horaInicio = '$fecha1', horaFinal = '$fecha2' WHERE codigoPedido = '$codigoPedido' AND idProducto = '$this->id'
+	   LIMIT 1;");
 	   $consulta->execute();
     }
 
@@ -532,11 +558,15 @@ class Producto
 	public function CambiarEstadoProductoPedidoDatabase($codigoPedido,$estado)
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+	   $retorno = 0;
 
        $consulta = $objetoAccesoDato->prepararConsulta(
-		"UPDATE pedprod SET estado = '$estado' WHERE codigoPedido = '$codigoPedido' AND idProducto = '$this->id'
+		"UPDATE pedprod SET estado = '$estado' WHERE codigoPedido = '$codigoPedido' AND idProducto = '$this->id' AND NOT estado = '$estado' 
 	   	LIMIT 1;");
-	   $consulta->execute();
+
+		$consulta->execute();
+
+		return $consulta->rowCount();
     }
 
 	public function CantidadDeVentas()

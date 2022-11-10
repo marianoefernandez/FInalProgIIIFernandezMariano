@@ -430,10 +430,25 @@ class PedidoController extends Pedido implements IApiUsable
         
             if($pedido->GetEstado() != $estadoInt)
             {  
-              Producto::CambiarEstadoProductoPedido($pedido,$producto,$estadoInt);
-              $payload = json_encode(array("mensaje" => "Se modifico el estado exitosamente"));          
-              Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado del producto con id $producto->id perteneciente al pedido con código $pedido->codigo a $estado");
-              $response->withStatus(200);
+              $payload = json_encode(array("mensaje" => "No se modifico porque el usuario no tiene acceso a ese producto. Usted esta logueado como $usuarioLoguado->rol y deberia ser $producto->rol"));          
+
+              if($producto->GetRol() == $usuarioLoguado->GetRol() || $usuarioLoguado->GetTipo() == "socio")
+              {
+                $payload = json_encode(array("mensaje" => "Sólo el mozo o el socio puede servir el producto"));          
+
+                if($estadoInt != ENTREGADO || $usuarioLoguado->GetTipo() == "socio")
+                {
+                  $payload = json_encode(array("mensaje" => "No puede asignarle al producto el estado $estado porque ya lo tiene asignado"));          
+
+                  if(Producto::CambiarEstadoProductoPedido($pedido,$producto,$estadoInt,$tiempoDePreparacion))
+                  {
+                    $payload = json_encode(array("mensaje" => "Se modifico el estado exitosamente"));          
+                    Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado del producto con id $producto->id perteneciente al pedido con código $pedido->codigo a $estado");
+                  }
+
+                  $response->withStatus(200);
+                }
+              }
             }
           }      
         }

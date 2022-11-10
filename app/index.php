@@ -230,7 +230,7 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
     
     //3-Debe cambiar el estado a “en preparación” y agregarle el tiempo de preparación
     //6-Debe cambiar el estado a “listo para servir” .
-    $group->get('/cambiarEstadoProducto',\PedidoController::class . ':CambiarEstadoUno')->add(new MWVerificar("empleado","todos"));
+    $group->put('/cambiarEstadoProducto',\PedidoController::class . ':CambiarEstadoUno')->add(new MWVerificar("empleado","todos"));
 
 });
 

@@ -692,8 +692,8 @@ class Pedido
 	public function ModificarEstadoDatabase()
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
-       $consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedidos SET estado = '$this->estado'");
-       $consulta->execute();
+	   $consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedidos SET estado = '$this->estado' WHERE codigo = '$this->codigo'");
+	   $consulta->execute();
     }
 
     public static function ObtenerTodosLosPedidos()
@@ -804,11 +804,49 @@ class Pedido
         $consulta = $objAccesoDatos->prepararConsulta("SELECT estado FROM pedprod WHERE codigoPedido = '$this->codigo';");
        	if($consulta->execute())
 		{
+			//var_dump($consulta);
+			$retorno = $consulta->fetchAll(PDO::FETCH_OBJ);
+	   	}
+
+		var_dump($retorno);
+
+        return $retorno;
+    }
+
+	public function ObtenerEstadoDelPedido()
+	{
+		$retorno = false;
+
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT estado FROM pedprod WHERE codigoPedido = '$this->codigo';");
+       	if($consulta->execute())
+		{
 			$retorno = $consulta->fetchAll(PDO::FETCH_OBJ);
 	   	}
 
         return $retorno;
     }
+
+	public static function VerificarEstado($pedido,$estadoInt)
+	{
+		$listaEstados = $pedido->ObtenerEstadosDelPedido();
+		if(count($listaEstados)> 0 && $listaEstados != false)
+		{
+			foreach ($listaEstados as $estado) 
+			{
+				if($estado->estado != $estadoInt)
+				{
+					return false;
+				}
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		return true;
+	}
 
 	//Me permite saber si el pedido termino y establece su estado como terminado
 	public static function VerificarTiempoPedidos()
