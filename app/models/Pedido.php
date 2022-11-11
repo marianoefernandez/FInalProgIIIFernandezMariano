@@ -175,6 +175,8 @@ class Pedido
 			{
 				$retorno=1;
 				$pedido->AgregarPedidoDatabase();
+				$mesa->SetEstado(ESPERANDO);
+				$mesa->CambiarEstadoMesaDatabase($mesa->GetEstado());
 			}
 		}
 
@@ -183,19 +185,18 @@ class Pedido
 
 	public static function ServirPedido($listaPedidos,$listaMesas,$pedido,$mesa)
 	{
-		$retorno=-1;//No hay pedidos terminados asignados al mozo
+		$retorno=-1;
 		if(count($listaPedidos) > 0) 
 		{
-			$retorno = 0;// La mesa está cerrada o el pedido seleccionado no está terminado o no pertenece al mozo
-			if(count($listaMesas) > 0 && $pedido != false && $mesa != false && $mesa->GetEstado != "CERRADA")
+			$retorno = 0;
+			if(count($listaMesas) > 0 && $pedido != false && $mesa != false && $mesa->GetEstado() != "CERRADA")
 			{
 				$pedido->SetEstado(ENTREGADO);
 				$mesa->SetEstado(COMIENDO);
-				//Cambiar estados de pedidos y productos
-				//Asignar tiempo de entrega de pedido
-				$pedido->ModificarEstadoDatabase();
+				$pedido->EntregarPedidoDatabase();
+				$pedido->ModificarHoraFinalDatabase(date("Y-m-j H:i:s"));
 				$mesa->CambiarEstadoMesaDatabase($mesa->GetEstado());
-				$retorno = 1;//El pedido fue servido
+				$retorno = 1;
 			}
 		}
 
@@ -385,7 +386,7 @@ class Pedido
 			$retorno.=("<td>".$usuario->GetNombre() . " ". $usuario->GetApellido() ."</td>");
 			$retorno.=("<td>".$pedido->GetCodigoMesa()."</td>");
 
-			if($pedido->GetEstado() != ENPREPARACION)
+			if($pedido->GetEstado() != PENDIENTE)
 			{
 				$retorno.=("<td>".$pedido->CalcularTiempoDePreparacion()."</td>");
 			
@@ -439,9 +440,18 @@ class Pedido
 			}
 			else
 			{
-				$pedido->VerificarSiTerminoElPedido() 
-				? $tiempoRestante = "El pedido ya fue entregado"
-				: $tiempoRestante = $pedido->CalcularTiempoDeRestante();
+
+				if($pedido->VerificarSiTerminoElPedido())
+				{
+					$pedido->GetEstado() == TERMINADO ?
+					$tiempoRestante = "Terminado" :
+					$tiempoRestante = "Entregado";
+				}
+				else
+				{
+					$tiempoRestante = $pedido->CalcularTiempoDeRestante();
+				}
+
 			}
 			
 			$retorno.=("<h3>Tiempo restante (Aproximado) : ".$tiempoRestante."<h3>");
@@ -460,11 +470,14 @@ class Pedido
 		if($len>0)
 		{
 			$retorno=("<table>");
-			$retorno.=("<th>[Pedido Codigo]</th><th>[Atendio]</th><th>[Mesa Codigo]</th><th>[Tiempo de Preparación Aproximado]</th><th>[Tiempo Restante Aproximado]</th>");
 			
-			if($estado == ENPREPARACION)
+			if($estado == PENDIENTE)
 			{
 				$retorno.=("<th>[Pedido Codigo]</th><th>[Atendio]</th><th>[Mesa Codigo]</th>");
+			}
+			else
+			{
+				$retorno.=("<th>[Pedido Codigo]</th><th>[Atendio]</th><th>[Mesa Codigo]</th><th>[Tiempo de Preparación Aproximado]</th><th>[Tiempo Restante Aproximado]</th>");
 			}
 			
 			foreach($listaPedidos as $pedido)
@@ -606,21 +619,6 @@ class Pedido
 		return $listaPedidos;
 	}
 
-	public function CalcularTiempoDePreparacion()
-	{
-		$retorno = "Pendiente";
-		$horaInicio = $this->GetHoraInicio();
-		$horaFinal = $this->GetHoraFinal();
-
-		if(isset($horaInicio) && isset($horaFinal))
-		{
-			$retorno = $horaFinal->getTimestamp() - $horaInicio->getTimestamp();
-			$retorno .= " segundos";
-		}
-
-		return $retorno;
-	}
-
 	public function CalcularTiempoDeRestante()
 	{
 		$retorno = "Pendiente";
@@ -693,6 +691,13 @@ class Pedido
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
 	   $consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedidos SET estado = '$this->estado' WHERE codigo = '$this->codigo'");
+	   $consulta->execute();
+    }
+
+	public function ModificarHoraFinalDatabase($horaFinal)
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+	   $consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedidos SET horaFinal = '$horaFinal' WHERE codigo = '$this->codigo'");
 	   $consulta->execute();
     }
 
@@ -804,11 +809,9 @@ class Pedido
         $consulta = $objAccesoDatos->prepararConsulta("SELECT estado FROM pedprod WHERE codigoPedido = '$this->codigo';");
        	if($consulta->execute())
 		{
-			//var_dump($consulta);
 			$retorno = $consulta->fetchAll(PDO::FETCH_OBJ);
 	   	}
 
-		var_dump($retorno);
 
         return $retorno;
     }
@@ -848,6 +851,34 @@ class Pedido
 		return true;
 	}
 
+	public function EntregarPedidoDatabase()
+	{
+		$this->ModificarEstadoDatabase();
+		$objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+		$consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedprod SET estado = 2 WHERE codigoPedido = '$this->codigo'");
+		$consulta->execute();
+	}
+
+	public function CalcularTiempoDePreparacion()
+	{
+		$retorno=false;
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT TIMESTAMPDIFF(SECOND,MIN(horaInicio), MAX(horaFinal)) FROM pedprod WHERE codigoPedido = '$this->codigo';");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetch(PDO::FETCH_NUM);
+			$retorno = $retorno[0];
+		}
+
+		if($retorno== false)
+		{
+			$retorno = 0;
+		}
+
+        return $retorno;
+	}
+/*
 	//Me permite saber si el pedido termino y establece su estado como terminado
 	public static function VerificarTiempoPedidos()
 	{
@@ -875,6 +906,7 @@ class Pedido
 			}
 		}
 	}
+	*/
 }
 
 ?>

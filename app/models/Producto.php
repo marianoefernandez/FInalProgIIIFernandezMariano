@@ -353,7 +353,10 @@ class Producto
 
 		if($producto->CambiarEstadoProductoPedidoDatabase($pedido->GetCodigo(),$estadoInt))
 		{
-			$producto->CalcularTiempoFinal($tiempoPreparacion,$pedido);
+			if($tiempoPreparacion > 0)
+			{
+				$producto->CalcularTiempoFinal($tiempoPreparacion,$pedido);
+			}
 			if(Pedido::VerificarEstado($pedido,$estadoInt))
 			{
 				$pedido->SetEstado($estadoInt);

@@ -410,14 +410,15 @@ class PedidoController extends Pedido implements IApiUsable
         $estado = $parametros['estado'];
         $idProducto = $parametros['idProducto'];
         $codigoPedido = $parametros['codigoPedido'];
-        $tiempoDePreparacion = $parametros['tiempoDePreparacion'];
+        isset($parametros['tiempoDePreparacion']) ? $tiempoDePreparacion = $parametros['tiempoDePreparacion']
+        : $tiempoDePreparacion = 0;
         $payload = json_encode(array("mensaje" => "No se pudo modificar el estado, revise que los datos ingresados sean correctos"));          
         $response->withStatus(401);
         $pedido = Pedido::ObtenerPedido($codigoPedido);
         $producto = Producto::ObtenerProducto($idProducto);
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
 
-        if($pedido != false && $producto != false && is_numeric($tiempoDePreparacion) && $tiempoDePreparacion > 0)
+        if($pedido != false && $producto != false && is_numeric($tiempoDePreparacion))
         {
           $payload = json_encode(array("mensaje" => "Hubo un error al modificar el estado del pedido se ingreso un dato invalido"));          
 
