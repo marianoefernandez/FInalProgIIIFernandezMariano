@@ -3,6 +3,8 @@ require_once '../app/models/Usuario.php';
 require_once '../app/models/Logs.php';
 require_once './middlewares/AutentificadorJWT.php';
 require_once '../app/models/Validaciones.php';
+require_once '../app/models/Archivos.php';
+
 
 class LogOperacionesController extends Logs
 {
@@ -30,6 +32,12 @@ class LogOperacionesController extends Logs
         
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se mostraron todas las operaciones " 
         : $payload .= "Se mostraron todas las operaciones entre el $fechaInicio al $fechaFinal ";
+      
+        if(isset($parametros['descarga']))
+        {
+          GestionarArchivos($parametros['descarga'], $payload,$listaLog ,"listaLog" . $usuarioId);
+        }
+
       }
       
       $response->getBody()->write($payload);
@@ -81,6 +89,13 @@ class LogOperacionesController extends Logs
           {
             $payload=("<h2>No se encontro ningun log en el sistema</h2>");
           }
+          else
+          {
+            if(isset($parametros['descarga']))
+            {
+              GestionarArchivos($parametros['descarga'], $payload,$listaLog ,"listaLogsPorSector");
+            }
+          }
         }
       }
 
@@ -123,6 +138,16 @@ class LogOperacionesController extends Logs
           if($payload == "")
           {
             $payload=("<h2>No se encontro ningun log en el sistema</h2>");
+          }
+          else
+          {
+            if(isset($parametros['descarga']))
+            {
+              $fechaInicio == "" || $fechaFinal == "" ? $listaLog = Logs::ObtenerLogsOperaciones() 
+              : $listaLog = Logs::ObtenerLogsOperacionesEntreDosFechas($fechaInicio,$fechaFinal);
+    
+              GestionarArchivos($parametros['descarga'], $payload,$listaLog ,"listaLogsPorSectorSeparadaUsuario");
+            }
           }
         }
       }

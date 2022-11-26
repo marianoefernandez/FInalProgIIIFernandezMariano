@@ -5,12 +5,13 @@ require_once '../app/models/Opinion.php';
 require_once '../app/models/Logs.php';
 require_once '../app/interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
+require_once '../app/models/Archivos.php';
 
 class OpinionController extends Opinion
 {
   public function TraerMejoresComentarios($request, $response, $args)
   {
-      // Buscamos mesa por id
+      $parametros = $request->getParsedBody();
       $usuarioLoguado = OpinionController::TraerUsuarioActual($request,$response,$args);
       $payload = json_encode(array("mensaje" => "Filtro invalido"));
       $filtro = $args['filtro'];
@@ -25,6 +26,12 @@ class OpinionController extends Opinion
           $payload = "Los comentarios con mayor $filtro son <br><br>";
           $payload .= Opinion::RetornarListaComentarios($comentarios);
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios con la nota más alta de $filtro");
+        
+          if(isset($parametros['descarga']))
+          {
+            GestionarArchivos($parametros['descarga'], $payload,$comentarios ,"mejoresComentarios por $filtro");
+          }
+        
         }
       }
 
@@ -35,7 +42,7 @@ class OpinionController extends Opinion
 
   public function TraerPeoresComentarios($request, $response, $args)
   {
-      // Buscamos mesa por id
+      $parametros = $request->getParsedBody();
       $usuarioLoguado = OpinionController::TraerUsuarioActual($request,$response,$args);
       $payload = json_encode(array("mensaje" => "Filtro invalido"));
       $filtro = $args['filtro'];
@@ -50,6 +57,12 @@ class OpinionController extends Opinion
           $payload = "Los comentarios con menor $filtro son <br><br>";
           $payload .= Opinion::RetornarListaComentarios($comentarios);
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios con la nota más baja de $filtro");
+        
+          if(isset($parametros['descarga']))
+          {
+            GestionarArchivos($parametros['descarga'], $payload,$comentarios ,"peoresComentarios por $filtro");
+          }
+        
         }
       }
 
@@ -60,7 +73,7 @@ class OpinionController extends Opinion
 
     public function TraerMejoresComentariosPorMesa($request, $response, $args)
     {
-        // Buscamos mesa por id
+        $parametros = $request->getParsedBody();
         $usuarioLoguado = OpinionController::TraerUsuarioActual($request,$response,$args);
 
         $mesaCodigo = $args['codigoMesa'];
@@ -79,6 +92,11 @@ class OpinionController extends Opinion
             $payload = "Los comentarios con la más alta calificación para la mesa con código $mesa->codigo son<br><br>";
             $payload .= Opinion::RetornarListaComentarios($comentarios);
             Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios mejor valorados de la mesa con código $mesa->codigo");
+            
+            if(isset($parametros['descarga']))
+            {
+              GestionarArchivos($parametros['descarga'], $payload,$comentarios ,"mejoresComentarios $mesaCodigo");
+            }
           }
         }
 
@@ -89,7 +107,7 @@ class OpinionController extends Opinion
     
     public function TraerPeoresComentariosPorMesa($request, $response, $args)
     {
-        // Buscamos mesa por id
+        $parametros = $request->getParsedBody();
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
 
         $mesaCodigo = $args['codigoMesa'];
@@ -107,6 +125,11 @@ class OpinionController extends Opinion
             $payload = "Los comentarios con la más baja calificación para la mesa con código $mesa->codigo son<br><br>";
             $payload .= Opinion::RetornarListaComentarios($comentarios);
             Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios peor valorados de la mesa con código $mesa->codigo");
+          
+            if(isset($parametros['descarga']))
+            {
+              GestionarArchivos($parametros['descarga'], $payload,$comentarios ,"peoresComentarios $mesaCodigo");
+            }
           }
         }
 

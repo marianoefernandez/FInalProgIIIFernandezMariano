@@ -6,6 +6,7 @@ require_once '../app/models/Opinion.php';
 require_once '../app/models/Logs.php';
 require_once '../app/interfaces/IApiUsable.php';
 require_once './middlewares/AutentificadorJWT.php';
+require_once '../app/models/Archivos.php';
 
 class MesaController extends Mesa implements IApiUsable
 {
@@ -84,8 +85,15 @@ class MesaController extends Mesa implements IApiUsable
           $payload .= Mesa::RetornarListaDeMesasString($mesasMasUsadas);
           count($mesasMasUsadas) > 1 ? $payload .= "<br>Las mismas tienen $maximo pedidos dados de alta<br>"
           : $payload .= "<br>La misma tiene $maximo pedidos dados de alta<br>";
-
+          
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas usadas");
+          
+          if(isset($parametros['descarga']))
+          {
+            count($mesasMasUsadas) > 1 ?
+            GestionarArchivos($parametros['descarga'], $payload,$mesasMasUsadas ,"mesasMasUsadas") :
+            GestionarArchivos($parametros['descarga'], $payload,$mesasMasUsadas ,"mesaMasUsada");
+          }
         }
 
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
@@ -123,6 +131,14 @@ class MesaController extends Mesa implements IApiUsable
           : $payload .= "<br>La misma tiene $minimo pedidos dados de alta<br>";
 
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas menos usadas");
+        
+          if(isset($parametros['descarga']))
+          {
+            count($mesasMenosUsadas) > 1 ?
+            GestionarArchivos($parametros['descarga'], $payload,$mesasMenosUsadas ,"mesasMenosUsadas") :
+            GestionarArchivos($parametros['descarga'], $payload,$mesasMenosUsadas ,"mesaMenosUsada");
+          }
+
         }   
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
@@ -158,6 +174,13 @@ class MesaController extends Mesa implements IApiUsable
           : $payload .= "<br>La misma recaudo $$maximo<br>";
   
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas dinero recaudaron");
+        
+          if(isset($parametros['descarga']))
+          {
+            count($mesasQueMasRecaudaron) > 1 ?
+            GestionarArchivos($parametros['descarga'], $payload,$mesasQueMasRecaudaron ,"mesasQueMasRecaudaron") :
+            GestionarArchivos($parametros['descarga'], $payload,$mesasQueMasRecaudaron ,"mesaQueMasRecaudo");
+          }
         }
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
@@ -193,6 +216,14 @@ class MesaController extends Mesa implements IApiUsable
           : $payload .= "<br>La misma recaudo $$minimo<br>";
   
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas dinero recaudaron");
+        
+          if(isset($parametros['descarga']))
+          {
+            count($mesasQueMenosRecaudaron) > 1 ?
+            GestionarArchivos($parametros['descarga'], $payload,$mesasQueMenosRecaudaron ,"mesasQueMenosRecaudaron") :
+            GestionarArchivos($parametros['descarga'], $payload,$mesasQueMenosRecaudaron ,"mesaQueMenosRecaudo");
+          }
+        
         }
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
@@ -258,6 +289,14 @@ class MesaController extends Mesa implements IApiUsable
           $payload .= "<br>La factura fue de $$maximo<br>";
   
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura más cara");
+          
+          if(isset($parametros['descarga']))
+          {
+            count($mesasFacturaMayor) > 1 ?
+            GestionarArchivos($parametros['descarga'], $payload,$mesasFacturaMayor ,"mesasFacturaMayor") :
+            GestionarArchivos($parametros['descarga'], $payload,$mesasFacturaMayor ,"mesaFacturaMayor");
+          }
+
         }
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";   
@@ -293,6 +332,14 @@ class MesaController extends Mesa implements IApiUsable
           $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMenor);
           $payload .= "<br>La factura fue de $$minimo<br>";
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura más barata");
+        
+          if(isset($parametros['descarga']))
+          {
+            count($mesasFacturaMenor) > 1 ?
+            GestionarArchivos($parametros['descarga'], $payload,$mesasFacturaMenor ,"mesasFacturaMenor") :
+            GestionarArchivos($parametros['descarga'], $payload,$mesasFacturaMenor ,"mesaFacturaMenor");
+          }
+
         }
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";  
@@ -332,66 +379,17 @@ class MesaController extends Mesa implements IApiUsable
                 if(isset($facturacion) && is_float($facturacion))
                 {
                   $facturacion = number_format($facturacion, 2, '.', '');
-                  $payload = json_encode("La mesa con código $mesa->codigo facturo $$facturacion entre el $fechaInicio hasta el $fechaFinal ");                          
+                  $payload = ("<h2>La mesa con código $mesa->codigo facturo $$facturacion entre el $fechaInicio hasta el $fechaFinal<h2>");                          
                 }
                 Logs::AgregarLogOperacion($usuarioLoguado,"pidio la facturación de la mesa con código $mesa->codigo entre las fechas $fechaInicio y $fechaFinal");
-            }
+                
+                if(isset($parametros['descarga']))
+                {
+                  GestionarArchivos($parametros['descarga'], $payload,$mesa ,"mesa $mesa->codigo factura entre $fechaInicio a $fechaFinal");
+                }
+
+              }
           }
-        }
-
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
-    }
-
-    public function TraerMejoresComentariosPorMesa($request, $response, $args)
-    {
-        // Buscamos mesa por id
-        $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
-        $mesaCodigo = $args['codigoMesa'];
-        $mesa = Mesa::ObtenerMesa($mesaCodigo);
-
-        $payload = json_encode(array("mensaje" => "La mesa no existe"));
-
-        if($mesa != false)
-        {
-          $payload = json_encode(array("mensaje" => "No hay ningun comentario que corresponda dicha mesa"));
-          $comentarios = Opinion::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MAX");
-
-          if(count($comentarios)>0)
-          {
-            $payload = "Los comentarios con la más alta calificación para la mesa con código $mesa->codigo son<br><br>";
-            $payload .= Opinion::RetornarListaComentarios($comentarios);
-          }
-          Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios mejor valorados de la mesa con código $mesa->codigo");
-        }
-
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
-    }
-    
-    public function TraerPeoresComentariosPorMesa($request, $response, $args)
-    {
-        // Buscamos mesa por id
-        $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
-
-        $mesaCodigo = $args['codigoMesa'];
-        $mesa = Mesa::ObtenerMesa($mesaCodigo);
-
-        $payload = json_encode(array("mensaje" => "La mesa no existe"));
-
-        if($mesa != false)
-        {
-          $payload = json_encode(array("mensaje" => "No hay ningun comentario que corresponda dicha mesa"));
-          $comentarios = Opinion::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MIN");
-
-          if(count($comentarios)>0)
-          {
-            $payload = "Los comentarios con la más baja calificación para la mesa con código $mesa->codigo son<br><br>";
-            $payload .= Opinion::RetornarListaComentarios($comentarios);
-          }
-          Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios peor valorados de la mesa con código $mesa->codigo");
         }
 
         $response->getBody()->write($payload);

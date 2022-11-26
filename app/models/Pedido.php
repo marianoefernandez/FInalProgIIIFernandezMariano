@@ -715,6 +715,20 @@ class Pedido
         return $retorno;
     }
 
+	public static function ObtenerTodosLosPedidosPorEstado($estado)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE estado = $estado");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+		}
+
+        return $retorno;
+    }
+
     public static function ObtenerTodosLosPedidosPorEmpleado($idEmpleado)
     {
 		$retorno=array();
@@ -743,6 +757,19 @@ class Pedido
         return $retorno;
     }
 
+	public static function ObtenerTodosLosPedidosPorFechaYEstado($fecha1,$fecha2,$estado)
+    {
+		$retorno=array();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,idUsuario,horaInicio,horaFinal,codigo,estado FROM pedidos WHERE horaFinal BETWEEN '$fecha1 00:00:00' AND '$fecha2 23:59:59' AND estado = $estado");
+
+		if($consulta->execute())
+		{
+			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+		}
+
+        return $retorno;
+    }
 	public static function ObtenerTodosLosPedidosQueNoLlegaronATiempo()
     {
 		$retorno=array();

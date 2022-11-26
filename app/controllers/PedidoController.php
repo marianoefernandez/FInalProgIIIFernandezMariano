@@ -2,6 +2,7 @@
 require_once '../app/models/Pedido.php';
 require_once '../app/models/Producto.php';
 require_once '../app/models/Usuario.php';
+require_once '../app/models/Archivos.php';
 require_once '../app/models/Logs.php';
 require_once '../app/models/Validaciones.php';
 require_once '../app/interfaces/IApiUsable.php';
@@ -174,6 +175,14 @@ class PedidoController extends Pedido implements IApiUsable
           if($payload != false)
           {            
             Logs::AgregarLogOperacion($usuarioLoguado,"trajo los productos de todos los pedidos en estado $filtro");
+            if(isset($parametros['descarga']))
+            {
+              $fechaInicio == "" && $fechaFinal == "" ?
+              $listaPedidos = Pedido::ObtenerTodosLosPedidosPorEstado($estadoInt) :
+              $listaPedidos = Pedido::ObtenerTodosLosPedidosPorFechaYEstado($fechaInicio,$fechaFinal,$estadoInt);
+              
+              GestionarArchivos($parametros['descarga'], $payload,$listaPedidos ,"pedidos$filtro");
+            }
           }
           else
           {
@@ -295,6 +304,12 @@ class PedidoController extends Pedido implements IApiUsable
           $payload .= "<br>La cantidad vendida fue de $maximo unidades<br>";
   
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos más vendidos");
+          if(isset($parametros['descarga']))
+          {
+            count($productosMasVendidos) > 1 ?
+            GestionarArchivos($parametros['descarga'], $payload,$productosMasVendidos ,"productosMasVendido") :
+            GestionarArchivos($parametros['descarga'], $payload,$productosMasVendidos ,"productoMasVendido");
+          }
         }
         
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
@@ -330,6 +345,13 @@ class PedidoController extends Pedido implements IApiUsable
           $payload .= "<br>La cantidad vendida fue de $minimo unidades<br>";
   
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos menos vendidos");
+        
+          if(isset($parametros['descarga']))
+          {
+            count($productosMenosVendidos) > 1 ?
+            GestionarArchivos($parametros['descarga'], $payload,$productosMenosVendidos ,"productosMenosVendidos") :
+            GestionarArchivos($parametros['descarga'], $payload,$productosMenosVendidos ,"productoMenosVendido");
+          }
         }
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
@@ -368,6 +390,11 @@ class PedidoController extends Pedido implements IApiUsable
         
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
+
+        if(isset($parametros['descarga']))
+        {
+          GestionarArchivos($parametros['descarga'], $payload,$listaPedidosNoEntregadosATiempo ,"pedidosNoEntregadosATiempo");
+        }
       }
 
       $response->getBody()->write($payload);

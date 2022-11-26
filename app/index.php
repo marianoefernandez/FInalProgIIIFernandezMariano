@@ -19,6 +19,7 @@ require __DIR__ . '/controllers/ProductoController.php';
 require __DIR__ . '/controllers/LogLoginController.php';
 require __DIR__ . '/controllers/ClientesController.php';
 require __DIR__ . '/controllers/OpinionController.php';
+require __DIR__ . '/controllers/PDFController.php';
 require __DIR__ . '/controllers/LogOperacionesController.php';
 require __DIR__ . './middlewares/MWVerificar.php';
 require_once './db/AccesoDatos.php';
@@ -240,6 +241,13 @@ $app->group('/clientes', function (RouteCollectorProxy $group)
     $group->post('/darOpinion',\ClientesController::class . ':DarOpinion');
     $group->get('/mostrarTiempoDemora',\ClientesController::class . ':TraerTiempoDemora');
 
+});
+
+$app->group('/descargas', function (RouteCollectorProxy $group)
+{
+    $group->get('/descargarLogo',\PDFController::class . ':DescargarLogo')->add(new MWVerificar("socio","todos"));
+
+    
 });
 
 $app->group('/opiniones', function (RouteCollectorProxy $group) 

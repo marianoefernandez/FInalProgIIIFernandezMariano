@@ -3,6 +3,8 @@ require_once '../app/models/Usuario.php';
 require_once '../app/models/Validaciones.php';
 require_once '../app/models/Logs.php';
 require_once './middlewares/AutentificadorJWT.php';
+require_once '../app/models/Archivos.php';
+
 
 class LogLoginController extends Logs
 {
@@ -29,6 +31,12 @@ class LogLoginController extends Logs
         }
         
         $payload .= Logs::RetornarListaDeLogsLoginPorId($listaLog,$usuarioId);
+
+        if(isset($parametros['descarga']))
+        {
+          GestionarArchivos($parametros['descarga'], $payload,$listaLog ,"listaLogs");
+        }
+
       }
 
       $response->getBody()->write($payload);
@@ -58,6 +66,11 @@ class LogLoginController extends Logs
         }
 
         $payload .= Logs::RetornarListaDeLogsLogin($listaLog);
+
+        if(isset($parametros['descarga']))
+        {
+          GestionarArchivos($parametros['descarga'], $payload,$listaLog ,"listaLogs");
+        }
       }
 
       $response->getBody()->write($payload);

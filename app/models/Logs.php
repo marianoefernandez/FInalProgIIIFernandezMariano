@@ -107,7 +107,6 @@ class Logs
         $this->fechaOperacion=$value;
 	}
 
-
     public static function RetornarListaDeLogsLogin($listaLogs)
 	{
 		$flag=0;
