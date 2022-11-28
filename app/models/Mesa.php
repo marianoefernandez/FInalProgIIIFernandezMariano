@@ -122,6 +122,44 @@ class Mesa
 		return $retorno;
 	}
 
+	public static function CargaForzada($mesas)
+	{
+		$contador = 0;
+
+		foreach ($mesas as $mesa) 
+		{
+			if(Mesa::VerificarExistencia($mesa) && count((array)$mesa) == 3)
+			{
+				var_dump($mesa);
+				$mesaAux = new Mesa();
+				$mesaAux->SetCodigo($mesa->codigo);
+				$mesaAux->SetEstado((int)$mesa->estado);
+				$mesaAux->SetFechaDeCreacion($mesa->fechaDeCreacion);
+				
+				$mesaAux->AgregarMesaDatabase();
+				$contador++;
+			}
+		}
+
+		return $contador;
+	}
+
+	//Retorna 1 si la mesa no existe 0 si existe en la database
+	public static function VerificarExistencia($mesa)
+	{
+		$listaMesas = Mesa::ObtenerTodasLasMesas();
+
+		foreach ($listaMesas as $mesaAux) 
+		{
+			if($mesaAux->codigo == $mesa->codigo)
+			{
+				return 0;
+			}
+		}
+
+		return 1;
+	}
+
 	public static function CambiarEstadoMesa($mesa,$estado)
 	{	
 		$mesa->CambiarEstadoMesaDatabase($estado);

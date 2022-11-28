@@ -1,0 +1,5 @@
+id,nombre,apellido,email,clave,tipo,rol,fechaDeInicioActividades,estado
+33,Juan,Perez,juanperez@gmail.com,123456,empleado,mozo,2022-11-11,1
+44,Facundo,Gomez,facugomez@gmail.com,1234,empleado,bartender,2022-13-18,1
+55,Lionel, Messi,leomessi@gmail.com,123456,empleado,cocinero,2022-11-22,1
+66,Diego,Castro,diegocastro@gmail.com,12345,empleado,cervecero,2022-11-24,1

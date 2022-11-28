@@ -21,6 +21,7 @@ require __DIR__ . '/controllers/ClientesController.php';
 require __DIR__ . '/controllers/OpinionController.php';
 require __DIR__ . '/controllers/PDFController.php';
 require __DIR__ . '/controllers/LogOperacionesController.php';
+require __DIR__ . '/controllers/CsvController.php';
 require __DIR__ . './middlewares/MWVerificar.php';
 require_once './db/AccesoDatos.php';
 
@@ -255,6 +256,11 @@ $app->group('/opiniones', function (RouteCollectorProxy $group)
     $group->get('/mejoresComentarios/{filtro}',\OpinionController::class . ':TraerMejoresComentarios')->add(new MWVerificar("socio","todos"));
     $group->get('/peoresComentarios/{filtro}',\OpinionController::class . ':TraerPeoresComentarios')->add(new MWVerificar("socio","todos"));
 
+});
+
+$app->group('/cargaForzadaCSV', function (RouteCollectorProxy $group) 
+{
+    $group->post('/{filtro}',\CsvController::class . ':CargaForzada')->add(new MWVerificar("socio","todos"));
 });
 
 $app->run();

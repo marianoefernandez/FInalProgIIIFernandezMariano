@@ -25,7 +25,7 @@ class OpinionController extends Opinion
         {
           $payload = "Los comentarios con mayor $filtro son <br><br>";
           $payload .= Opinion::RetornarListaComentarios($comentarios);
-          Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios con la nota más alta de $filtro");
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre los comentarios con la nota mas alta de $filtro");
         
           if(isset($parametros['descarga']))
           {
@@ -56,7 +56,7 @@ class OpinionController extends Opinion
         {
           $payload = "Los comentarios con menor $filtro son <br><br>";
           $payload .= Opinion::RetornarListaComentarios($comentarios);
-          Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios con la nota más baja de $filtro");
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre los comentarios con la nota mas baja de $filtro");
         
           if(isset($parametros['descarga']))
           {
@@ -91,7 +91,7 @@ class OpinionController extends Opinion
           {
             $payload = "Los comentarios con la más alta calificación para la mesa con código $mesa->codigo son<br><br>";
             $payload .= Opinion::RetornarListaComentarios($comentarios);
-            Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios mejor valorados de la mesa con código $mesa->codigo");
+            Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre los comentarios mejor valorados de la mesa con codigo $mesa->codigo");
             
             if(isset($parametros['descarga']))
             {
@@ -124,7 +124,7 @@ class OpinionController extends Opinion
           {
             $payload = "Los comentarios con la más baja calificación para la mesa con código $mesa->codigo son<br><br>";
             $payload .= Opinion::RetornarListaComentarios($comentarios);
-            Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre los comentarios peor valorados de la mesa con código $mesa->codigo");
+            Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre los comentarios peor valorados de la mesa con codigo $mesa->codigo");
           
             if(isset($parametros['descarga']))
             {

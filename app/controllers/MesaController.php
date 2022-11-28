@@ -30,7 +30,7 @@ class MesaController extends Mesa implements IApiUsable
         if(Mesa::AltaMesa($mesa))
         {
           $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
-          Logs::AgregarLogOperacion($usuarioLoguado,"dio de alta la mesa con código $mesa->codigo");
+          Logs::AgregarLogOperacion($usuarioLoguado,"dio de alta la mesa con codigo $mesa->codigo");
         }
 
         $response->getBody()->write($payload);
@@ -53,7 +53,7 @@ class MesaController extends Mesa implements IApiUsable
             $mesaAux = array();
             array_push($mesaAux,$mesa);
             $payload = Mesa::RetornarListaDeMesasString($mesaAux);
-            Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre la mesa con código $mesa->codigo");
+            Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre la mesa con codigo $mesa->codigo");
         }
 
         $response->getBody()->write($payload);
@@ -251,7 +251,7 @@ class MesaController extends Mesa implements IApiUsable
         {
           $payload = Mesa::RetornarListaDeMesasConRecaudacionString($listaMesas,$fechaInicio,$fechaFinal);
   
-          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas ordenadas por recaudación");
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas ordenadas por recaudacion");
         }
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
@@ -288,7 +288,7 @@ class MesaController extends Mesa implements IApiUsable
           $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMayor);
           $payload .= "<br>La factura fue de $$maximo<br>";
   
-          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura más cara");
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura mas cara");
           
           if(isset($parametros['descarga']))
           {
@@ -331,7 +331,7 @@ class MesaController extends Mesa implements IApiUsable
           : $payload = "La mesa que tuvo la factura menor fue <br><br>";
           $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMenor);
           $payload .= "<br>La factura fue de $$minimo<br>";
-          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura más barata");
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura mas barata");
         
           if(isset($parametros['descarga']))
           {
@@ -381,7 +381,7 @@ class MesaController extends Mesa implements IApiUsable
                   $facturacion = number_format($facturacion, 2, '.', '');
                   $payload = ("<h2>La mesa con código $mesa->codigo facturo $$facturacion entre el $fechaInicio hasta el $fechaFinal<h2>");                          
                 }
-                Logs::AgregarLogOperacion($usuarioLoguado,"pidio la facturación de la mesa con código $mesa->codigo entre las fechas $fechaInicio y $fechaFinal");
+                Logs::AgregarLogOperacion($usuarioLoguado,"pidio la facturación de la mesa con codigo $mesa->codigo entre las fechas $fechaInicio y $fechaFinal");
                 
                 if(isset($parametros['descarga']))
                 {
@@ -466,7 +466,7 @@ class MesaController extends Mesa implements IApiUsable
                   $payload = json_encode(array("mensaje" => "Mesa cobrada con éxito. El socio debe cerrar la mesa ahora"));          
                 }
 
-                Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado de la mesa con código $mesa->codigo a $estado ");
+                Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado de la mesa con codigo $mesa->codigo a $estado ");
                 $response->withStatus(200);
               }
             }

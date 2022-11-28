@@ -133,7 +133,7 @@ class PedidoController extends Pedido implements IApiUsable
         if($pedido != false)
         {
           $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
-          Logs::AgregarLogOperacion($usuarioLoguado,"trajo el pedido con código $pedido->codigo");
+          Logs::AgregarLogOperacion($usuarioLoguado,"trajo el pedido con codigo $pedido->codigo");
           $payload = Pedido::RetornarUnPedidoString($pedido);
         }
 
@@ -303,7 +303,7 @@ class PedidoController extends Pedido implements IApiUsable
           $payload .= Producto::RetornarListaDeProductosString($productosMasVendidos,"","");
           $payload .= "<br>La cantidad vendida fue de $maximo unidades<br>";
   
-          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos más vendidos");
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos mas vendidos");
           if(isset($parametros['descarga']))
           {
             count($productosMasVendidos) > 1 ?
@@ -471,7 +471,7 @@ class PedidoController extends Pedido implements IApiUsable
                   if(Producto::CambiarEstadoProductoPedido($pedido,$producto,$estadoInt,$tiempoDePreparacion))
                   {
                     $payload = json_encode(array("mensaje" => "Se modifico el estado exitosamente"));          
-                    Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado del producto con id $producto->id perteneciente al pedido con código $pedido->codigo a $estado");
+                    Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado del producto con id $producto->id perteneciente al pedido con codigo $pedido->codigo a $estado");
                   }
 
                   $response->withStatus(200);

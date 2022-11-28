@@ -287,6 +287,55 @@ class Usuario
 		return $retorno;
 	}
 
+	public static function CargaForzada($usuarios)
+	{
+		$contador = 0;
+
+		foreach ($usuarios as $usuario) 
+		{
+			if(Usuario::VerificarExistencia($usuario) && count((array)$usuario) == 9)
+			{
+				$usuarioAux = new Usuario();
+				$usuarioAux->SetID((int)$usuario->id);
+				$usuarioAux->SetNombre($usuario->nombre);
+				$usuarioAux->SetApellido($usuario->apellido);
+				$usuarioAux->SetEmail($usuario->email);
+				$usuarioAux->SetClave($usuario->clave);
+				$usuarioAux->SetTipo($usuario->tipo);
+				$usuarioAux->SetRol($usuario->rol);
+				$usuarioAux->SetFechaInicio($usuario->fechaDeInicioActividades);
+				$usuarioAux->SetEstado((int)$usuario->estado);
+
+				$usuarioAux->CargaForzadaDatabase();
+				$contador++;
+			}
+		}
+
+		return $contador;
+	}
+
+	//Retorna 1 si el usuario ya tiene asignado un mail no disponible o si su id corresponde con otro 0 si existe en la database
+	public static function VerificarExistencia($usuario)
+	{
+		$listaUsuarios = Usuario::ObtenerTodosLosUsuarios();
+
+		foreach ($listaUsuarios as $usuarioAux) 
+		{
+			if($usuarioAux->email == $usuario->email || $usuarioAux->id == $usuario->id)
+			{
+				return 0;
+			}
+		}
+
+		return 1;
+	}
+
+	//Verifica si todos los datos del usuario corresponden
+	public function VerificarDatosUsuario()
+	{
+		return $this->GetNombre != "";
+	}
+
 	/*
 	///Obtiene la extension
 	public static function GetExtension($nombreArchivo)
@@ -475,6 +524,14 @@ class Usuario
     }
 
     //METODOS DATABASE
+
+    public function CargaForzadaDatabase()
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+	   $claveHash=password_hash($this->GetClave(),PASSWORD_DEFAULT);
+       $consulta = $objetoAccesoDato->prepararConsulta("INSERT into usuarios (id,nombre,apellido,email,clave,tipo,rol,fechaDeInicioActividades,estado)values('$this->id','$this->nombre','$this->apellido','$this->email','$claveHash','$this->tipo','$this->rol','$this->fechaDeInicioActividades','$this->estado')");
+       $consulta->execute();
+    }
 
     public function AgregarUsuarioDatabase()
     {
