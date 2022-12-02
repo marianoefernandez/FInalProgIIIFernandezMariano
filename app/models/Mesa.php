@@ -128,9 +128,8 @@ class Mesa
 
 		foreach ($mesas as $mesa) 
 		{
-			if(Mesa::VerificarExistencia($mesa) && count((array)$mesa) == 3)
+			if(Mesa::VerificarExistencia($mesa) && count((array)$mesa) == 3 && Mesa::ValidarMesa($mesa))
 			{
-				var_dump($mesa);
 				$mesaAux = new Mesa();
 				$mesaAux->SetCodigo($mesa->codigo);
 				$mesaAux->SetEstado((int)$mesa->estado);
@@ -143,7 +142,7 @@ class Mesa
 
 		return $contador;
 	}
-
+	
 	//Retorna 1 si la mesa no existe 0 si existe en la database
 	public static function VerificarExistencia($mesa)
 	{
@@ -159,6 +158,34 @@ class Mesa
 
 		return 1;
 	}
+
+	public static function VerificarExistenciaMesa($listaMesas,$codigoMesa)
+	{
+		foreach ($listaMesas as $mesaAux) 
+		{
+			if($mesaAux->GetCodigo() == $codigoMesa)
+			{
+				return 1;
+			}
+		}
+
+		return 0;
+	}
+
+	
+	public static function ValidarMesa($mesa)
+	{
+		foreach ($mesa as $key => $value) 
+		{
+			if(!isset($mesa->$key) || $mesa->$key == "")
+			{
+				return 0;
+			}
+		}
+
+		return (strlen($mesa->codigo) == 5 && is_numeric($mesa->estado) && ($mesa->estado > -2 && $mesa->estado < 3));
+	}
+	
 
 	public static function CambiarEstadoMesa($mesa,$estado)
 	{	

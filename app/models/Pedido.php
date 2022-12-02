@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Date;
 require_once "./db/AccesoDatos.php";
 require_once "Archivos.php";
 require_once "Producto.php";
+require_once "Mesa.php";
 define('CANCELADO',-2);
 define('PENDIENTE',-1);
 define('ENPREPARACION',0);
@@ -654,6 +655,87 @@ class Pedido
 		}
 
 		return true;
+	}
+
+	public static function CargaForzada($pedidos)
+	{
+		$contador = 0;
+
+		foreach ($pedidos as $pedido) 
+		{
+			if(Pedido::VerificarExistencia($pedido) && count((array)$pedido) == 6 && Pedido::ValidarPedido($pedido))
+			{
+				$pedidoAux = new Pedido();
+				$pedidoAux->SetCodigoMesa($pedido->codigoMesa);
+				$pedidoAux->SetIDUsuario($pedido->idUsuario);
+				$pedidoAux->SetHoraInicio($pedido->horaInicio);
+				$pedidoAux->SetHoraFinal($pedido->horaFinal);
+				$pedidoAux->SetCodigo($pedido->codigo);
+				$pedidoAux->SetEstado($pedido->estado);
+
+				$pedidoAux->AgregarPedidoDatabase();
+				$contador++;
+			}
+		}
+
+		return $contador;
+	}
+
+	//Retorna 1 si el usuario ya tiene asignado un mail no disponible o si su id corresponde con otro 0 si existe en la database
+	public static function VerificarExistencia($pedido)
+	{
+		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
+
+		foreach ($listaPedidos as $pedidoAux) 
+		{
+			if($pedidoAux->codigo == $pedido->codigo)
+			{
+				return 0;
+			}
+		}
+
+		return 1;
+	}
+
+	public static function VerificarExistenciaMesa($listaMesas,$pedido)
+	{
+		foreach ($listaMesas as $mesa) 
+		{
+			if($mesa->GetCodigo() == $pedido->codigoMesa)
+			{
+				return 1;
+			}
+		}
+
+		return 0;
+	}
+
+	public static function VerificarExistenciaPedido($listaPedidos,$codigoPedido)
+	{
+		foreach ($listaPedidos as $pedidoAux) 
+		{
+			if($pedidoAux->GetCodigo() == $codigoPedido)
+			{
+				return 1;
+			}
+		}
+
+		return 0;
+	}
+
+	public static function ValidarPedido($pedido)
+	{
+		$listaMesas = Mesa::ObtenerTodasLasMesas();
+
+		foreach ($pedido as $key => $value) 
+		{
+			if(!isset($pedido->$key) || $pedido->$key == "")
+			{
+				return 0;
+			}
+		}
+
+		return (strlen($pedido->codigo) == 5 && strlen($pedido->codigoMesa) == 5 && Pedido::VerificarExistenciaMesa($listaMesas,$pedido) && is_numeric($pedido->idUsuario) && is_numeric($pedido->estado) && ($pedido->estado > -3 && $pedido->estado < 3));
 	}
 
     //METODOS DATABASE

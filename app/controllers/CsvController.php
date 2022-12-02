@@ -39,9 +39,11 @@ class CsvController
                     break;
 
                 case "pedidos":
+                    $retornoCarga = Pedido::CargaForzada($lista);
                     break;   
 
                 case "productos":
+                    $retornoCarga = Producto::CargaForzada($lista);
                     break;
 
                 case "mesas":
@@ -49,6 +51,7 @@ class CsvController
                     break;
 
                 case "opiniones":
+                    $retornoCarga = Opinion::CargaForzada($lista);
                     break;
 
                 default:

@@ -368,6 +368,67 @@ class Producto
 		return $retorno;
 	}
 
+	public static function CargaForzada($productos)
+	{
+		$contador = 0;
+
+		foreach ($productos as $producto) 
+		{
+			if(Producto::VerificarExistencia($producto) && count((array)$producto) == 6 && Producto::ValidarProducto($producto))
+			{
+				$productoAux = new Producto();
+				$productoAux->SetID($producto->id);
+				$productoAux->SetNombre($producto->nombre);
+				$productoAux->SetTipo($producto->tipo);
+				$productoAux->SetRol($producto->rol);
+				$productoAux->SetFechaDeCreacion($producto->fechaDeCreacion);
+				$productoAux->SetPrecio($producto->precio);
+
+				$productoAux->CargaForzadaDatabase();
+				$contador++;
+			}
+		}
+
+		return $contador;
+	}
+
+	//Retorna 1 si el usuario ya tiene asignado un mail no disponible o si su id corresponde con otro 0 si existe en la database
+	public static function VerificarExistencia($producto)
+	{
+		$listaProductos = Producto::ObtenerTodosLosProductos();
+
+		foreach ($listaProductos as $productoAux) 
+		{
+			if($productoAux->id == $producto->id ||
+			($productoAux->nombre == $producto->nombre && $productoAux->tipo == $producto->tipo
+			&& $productoAux->rol == $producto->rol))
+			{
+				return 0;
+			}
+		}
+
+		return 1;
+	}
+
+	public static function ValidarProducto($producto)
+	{
+		foreach ($producto as $key => $value) 
+		{
+			if(!isset($producto->$key) || $producto->$key == "")
+			{
+				return 0;
+			}
+		}
+
+		return (is_numeric($producto->id) && is_numeric($producto->precio) && Producto::ValidarTipoYRol($producto));
+	}
+
+	public static function ValidarTipoYRol($producto)
+	{
+		return (($producto->tipo == "comida" || $producto->tipo == "bebida" || $producto->tipo == "postre") &&
+				($producto->rol == "bartender" || $producto->rol == "cervecero" || $producto->rol == "cocinero")); 
+	}
+
 	public function CalcularTiempoFinal($tiempoPreparacion,$pedido)
 	{
 		$this->AsignarTiemposDatabase(date("Y-m-j H:i:s"),date("Y-m-j H:i:s",$tiempoPreparacion + time()),$pedido->GetCodigo());
@@ -429,6 +490,13 @@ class Producto
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
        $consulta = $objetoAccesoDato->prepararConsulta("INSERT into productos (nombre,tipo,rol,fechaDeCreacion,precio)values('$this->nombre','$this->tipo','$this->rol','$this->fechaDeCreacion','$this->precio')");
+       $consulta->execute();
+    }
+
+	public function CargaForzadaDatabase()
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+       $consulta = $objetoAccesoDato->prepararConsulta("INSERT into productos (id,nombre,tipo,rol,fechaDeCreacion,precio)values('$this->id','$this->nombre','$this->tipo','$this->rol','$this->fechaDeCreacion','$this->precio')");
        $consulta->execute();
     }
 

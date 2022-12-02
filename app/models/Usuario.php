@@ -293,7 +293,7 @@ class Usuario
 
 		foreach ($usuarios as $usuario) 
 		{
-			if(Usuario::VerificarExistencia($usuario) && count((array)$usuario) == 9)
+			if(Usuario::VerificarExistencia($usuario) && count((array)$usuario) == 9 && Usuario::ValidarUsuario($usuario))
 			{
 				$usuarioAux = new Usuario();
 				$usuarioAux->SetID((int)$usuario->id);
@@ -330,10 +330,23 @@ class Usuario
 		return 1;
 	}
 
-	//Verifica si todos los datos del usuario corresponden
-	public function VerificarDatosUsuario()
+	public static function ValidarUsuario($usuario)
 	{
-		return $this->GetNombre != "";
+		foreach ($usuario as $key => $value) 
+		{
+			if(!isset($usuario->$key) || $usuario->$key == "")
+			{
+				return 0;
+			}
+		}
+
+		return (is_numeric($usuario->id) && Usuario::ValidarTipoYRol($usuario) && is_numeric($usuario->estado) && ($usuario->estado > -2 && $usuario->estado < 2));
+	}
+
+	public static function ValidarTipoYRol($usuario)
+	{
+		return (($usuario->tipo == "todos" || $usuario->tipo == "empleado" || $usuario->tipo == "socio") &&
+				($usuario->rol == "todos" || $usuario->rol == "mozo" || $usuario->rol == "bartender" || $usuario->rol == "cervecero" || $usuario->rol == "cocinero")); 
 	}
 
 	/*

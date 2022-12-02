@@ -295,12 +295,79 @@ class Opinion
 		return $retorno;
     }
 
+	public static function CargaForzada($opiniones)
+	{
+		$contador = 0;
+
+		foreach ($opiniones as $opinion) 
+		{
+			if(Opinion::VerificarExistencia($opinion) && count((array)$opinion) == 8 && Opinion::ValidarOpinion($opinion))
+			{
+				$opinionAux = new Opinion();
+				$opinionAux->SetID($opinion->id);
+				$opinionAux->SetNotaCocinero($opinion->notaCocinero);
+				$opinionAux->SetNotaMesa($opinion->notaMesa);
+				$opinionAux->SetNotaMozo($opinion->notaMozo);
+				$opinionAux->SetNotaRestaurante($opinion->notaRestaurante);
+				$opinionAux->SetCodigoMesa($opinion->codigoMesa);
+				$opinionAux->SetCodigoPedido($opinion->codigoPedido);
+				$opinionAux->SetComentario($opinion->comentario);
+
+				$opinionAux->CargaForzadaDatabase();
+				$contador++;
+			}
+		}
+
+		return $contador;
+	}
+
+	//Retorna 1 si el usuario ya tiene asignado un mail no disponible o si su id corresponde con otro 0 si existe en la database
+	public static function VerificarExistencia($opinion)
+	{
+		$listaOpiniones = Opinion::ObtenerTodasLasOpiniones();
+
+		foreach ($listaOpiniones as $opinionAux) 
+		{
+			if($opinionAux->id == $opinion->id || $opinionAux->codigoPedido == $opinion->codigoPedido)
+			{
+				return 0;
+			}
+		}
+
+		return 1;
+	}
+
+	public static function ValidarOpinion($opinion)
+	{
+		$listaMesas = Mesa::ObtenerTodasLasMesas();
+		$listaPedidos = Pedido::ObtenerTodosLosPedidos();
+
+		foreach ($opinion as $key => $value) 
+		{
+			if(!isset($opinion->$key) || $opinion->$key == "")
+			{
+				return 0;
+			}
+		}
+
+		return (is_numeric($opinion->id) && strlen($opinion->codigoMesa) == 5 && strlen($opinion->codigoPedido) == 5 && is_numeric($opinion->notaRestaurante) && 
+		is_numeric($opinion->notaMozo) && is_numeric($opinion->notaMesa) && is_numeric($opinion->notaCocinero) && strlen($opinion->comentario) < 67 &&
+		Mesa::VerificarExistenciaMesa($listaMesas,$opinion->codigoMesa) && Pedido::VerificarExistenciaPedido($listaPedidos,$opinion->codigoPedido));
+	}
+
     //METODOS DATABASE
 
     public function AgregarOpinionDatabase()
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
        $consulta = $objetoAccesoDato->prepararConsulta("INSERT into calificaciones (codigoMesa,codigoPedido,notaMesa,notaRestaurante,notaMozo,notaCocinero,comentario)values('$this->codigoMesa','$this->codigoPedido','$this->notaMesa','$this->notaRestaurante','$this->notaMozo','$this->notaCocinero','$this->comentario')");
+       $consulta->execute();
+    }
+
+	public function CargaForzadaDatabase()
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+       $consulta = $objetoAccesoDato->prepararConsulta("INSERT into calificaciones (id,codigoMesa,codigoPedido,notaMesa,notaRestaurante,notaMozo,notaCocinero,comentario)values('$this->id','$this->codigoMesa','$this->codigoPedido','$this->notaMesa','$this->notaRestaurante','$this->notaMozo','$this->notaCocinero','$this->comentario')");
        $consulta->execute();
     }
 
@@ -346,7 +413,7 @@ class Opinion
 	{
 		$retorno=array();
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT codigoMesa,codigoPedido,notaMesa,notaRestaurante,notaMozo,notaCocinero,comentario FROM calificaciones WHERE $filtroUno = (SELECT $filtroDos($filtroUno) FROM calificaciones);");
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id,codigoMesa,codigoPedido,notaMesa,notaRestaurante,notaMozo,notaCocinero,comentario FROM calificaciones WHERE $filtroUno = (SELECT $filtroDos($filtroUno) FROM calificaciones);");
        	if($consulta->execute())
 		{
 			$retorno = $consulta->fetchAll(PDO::FETCH_OBJ);
