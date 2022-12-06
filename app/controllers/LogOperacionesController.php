@@ -16,9 +16,11 @@ class LogOperacionesController extends Logs
       $usuarioId = $args['id'];
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
+        $estados = 200;
         if($fechaInicio == "" || $fechaFinal == "")
         {
           $listaLog = Logs::ObtenerLogsOperacionPorId($usuarioId);
@@ -41,8 +43,15 @@ class LogOperacionesController extends Logs
       }
       
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'application/json');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerTodosSector($request, $response, $args)
@@ -54,6 +63,7 @@ class LogOperacionesController extends Logs
       $roles = array("socio", "bartender", "cocinero", "mozo","cervecero");
       $payload = "Error -> No se ingreso un sector correspondiente del sistema (socio, mozo, bartender, cocinero, mozo, cervecero)";
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $estados = 400;
 
       if(ValidarSectores($rol))
       {   
@@ -91,6 +101,7 @@ class LogOperacionesController extends Logs
           }
           else
           {
+            $estados = 200;
             if(isset($parametros['descarga']))
             {
               GestionarArchivos($parametros['descarga'], $payload,$listaLog ,"listaLogsPorSector");
@@ -100,8 +111,15 @@ class LogOperacionesController extends Logs
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerTodosSectorUsuario($request, $response, $args)
@@ -113,6 +131,7 @@ class LogOperacionesController extends Logs
       $roles = array("socio", "bartender", "cocinero", "mozo","cervecero");
       $payload = "Error -> No se ingreso un sector correspondiente del sistema (socio, mozo, bartender, cocinero, mozo, cervecero)";
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $estados = 400;
 
       if(ValidarSectores($rol))
       {   
@@ -141,19 +160,28 @@ class LogOperacionesController extends Logs
           }
           else
           {
+            $estados = 200;
+
+            $fechaInicio == "" || $fechaFinal == "" ? $listaLog = Logs::ObtenerLogsOperaciones() 
+            : $listaLog = Logs::ObtenerLogsOperacionesEntreDosFechas($fechaInicio,$fechaFinal);
+
             if(isset($parametros['descarga']))
             {
-              $fechaInicio == "" || $fechaFinal == "" ? $listaLog = Logs::ObtenerLogsOperaciones() 
-              : $listaLog = Logs::ObtenerLogsOperacionesEntreDosFechas($fechaInicio,$fechaFinal);
-    
               GestionarArchivos($parametros['descarga'], $payload,$listaLog ,"listaLogsPorSectorSeparadaUsuario");
             }
           }
         }
       }
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'text/html');
+        
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
 }
     

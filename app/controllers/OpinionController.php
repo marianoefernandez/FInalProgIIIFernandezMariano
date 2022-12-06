@@ -15,10 +15,12 @@ class OpinionController extends Opinion
       $usuarioLoguado = OpinionController::TraerUsuarioActual($request,$response,$args);
       $payload = json_encode(array("mensaje" => "Filtro invalido"));
       $filtro = $args['filtro'];
+      $estados = 400;
+
       if($filtro == "notaMozo" || $filtro == "notaMesa" || $filtro == "notaRestaurante" || $filtro == "notaCocinero")
       {
         $payload = json_encode(array("mensaje" => "No se ha realizado ningun comentario"));
-
+        $estados = 200;
         $comentarios = Opinion::ObtenerMejoresOPeoresComentarios($filtro,"MAX");
   
         if(count($comentarios)>0)
@@ -26,7 +28,7 @@ class OpinionController extends Opinion
           $payload = "Los comentarios con mayor $filtro son <br><br>";
           $payload .= Opinion::RetornarListaComentarios($comentarios);
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre los comentarios con la nota mas alta de $filtro");
-        
+
           if(isset($parametros['descarga']))
           {
             GestionarArchivos($parametros['descarga'], $payload,$comentarios ,"mejoresComentarios por $filtro");
@@ -36,8 +38,15 @@ class OpinionController extends Opinion
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'application/json');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
   }
 
   public function TraerPeoresComentarios($request, $response, $args)
@@ -46,10 +55,12 @@ class OpinionController extends Opinion
       $usuarioLoguado = OpinionController::TraerUsuarioActual($request,$response,$args);
       $payload = json_encode(array("mensaje" => "Filtro invalido"));
       $filtro = $args['filtro'];
+      $estados = 400;
+
       if($filtro == "notaMozo" || $filtro == "notaMesa" || $filtro == "notaRestaurante" || $filtro == "notaCocinero")
       {
         $payload = json_encode(array("mensaje" => "No se ha realizado ningun comentario"));
-
+        $estados = 200;
         $comentarios = Opinion::ObtenerMejoresOPeoresComentarios($filtro,"MIN");
   
         if(count($comentarios)>0)
@@ -57,7 +68,7 @@ class OpinionController extends Opinion
           $payload = "Los comentarios con menor $filtro son <br><br>";
           $payload .= Opinion::RetornarListaComentarios($comentarios);
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre los comentarios con la nota mas baja de $filtro");
-        
+
           if(isset($parametros['descarga']))
           {
             GestionarArchivos($parametros['descarga'], $payload,$comentarios ,"peoresComentarios por $filtro");
@@ -67,32 +78,39 @@ class OpinionController extends Opinion
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'application/json');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
   }
 
     public function TraerMejoresComentariosPorMesa($request, $response, $args)
     {
         $parametros = $request->getParsedBody();
         $usuarioLoguado = OpinionController::TraerUsuarioActual($request,$response,$args);
-
         $mesaCodigo = $args['codigoMesa'];
-        var_dump($mesaCodigo);
         $mesa = Mesa::ObtenerMesa($mesaCodigo);
+        $estados = 400;
 
         $payload = json_encode(array("mensaje" => "La mesa no existe"));
 
         if($mesa != false)
         {
+          $estados = 200;
           $payload = json_encode(array("mensaje" => "No hay ningun comentario que corresponda dicha mesa"));
           $comentarios = Opinion::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MAX");
-
+          
           if(count($comentarios)>0)
           {
             $payload = "Los comentarios con la más alta calificación para la mesa con código $mesa->codigo son<br><br>";
             $payload .= Opinion::RetornarListaComentarios($comentarios);
             Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre los comentarios mejor valorados de la mesa con codigo $mesa->codigo");
-            
+
             if(isset($parametros['descarga']))
             {
               GestionarArchivos($parametros['descarga'], $payload,$comentarios ,"mejoresComentarios $mesaCodigo");
@@ -101,22 +119,30 @@ class OpinionController extends Opinion
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
     
     public function TraerPeoresComentariosPorMesa($request, $response, $args)
     {
         $parametros = $request->getParsedBody();
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
-
         $mesaCodigo = $args['codigoMesa'];
         $mesa = Mesa::ObtenerMesa($mesaCodigo);
+        $estados = 400;
 
         $payload = json_encode(array("mensaje" => "La mesa no existe"));
 
         if($mesa != false)
         {
+          $estados = 200;
           $payload = json_encode(array("mensaje" => "No hay ningun comentario que corresponda dicha mesa"));
           $comentarios = Opinion::ObtenerMejoresOPeoresComentariosPorMesa($mesa->GetCodigo(),"MIN");
 
@@ -125,7 +151,7 @@ class OpinionController extends Opinion
             $payload = "Los comentarios con la más baja calificación para la mesa con código $mesa->codigo son<br><br>";
             $payload .= Opinion::RetornarListaComentarios($comentarios);
             Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre los comentarios peor valorados de la mesa con codigo $mesa->codigo");
-          
+
             if(isset($parametros['descarga']))
             {
               GestionarArchivos($parametros['descarga'], $payload,$comentarios ,"peoresComentarios $mesaCodigo");
@@ -134,8 +160,15 @@ class OpinionController extends Opinion
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }    
 
     public static function TraerUsuarioActual($request, $response, $args)    

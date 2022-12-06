@@ -27,10 +27,10 @@ class PedidoController extends Pedido implements IApiUsable
         //$tiempoDePedido = $parametros['tiempoAproximado'];//Segundos
 
         $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
-
+        $estados = 400;
         //Creamos el pedido
         //$pedido = Pedido::ConstruirPedido($codigoMesa,$usuarioLoguado->GetID(),date("Y-m-j H:i:s"),date("Y-m-j H:i:s",time() + $tiempoDePedido));
-        $pedido = Pedido::ConstruirPedido($codigoMesa,time(),NULL);
+        $pedido = Pedido::ConstruirPedido($codigoMesa,$usuarioLoguado->GetID(),date("Y-m-j H:i:s"),NULL);
 
         switch(Pedido::AltaPedido($pedido))
         {
@@ -39,27 +39,36 @@ class PedidoController extends Pedido implements IApiUsable
             break;
 
           case 0:
-            $payload = json_encode(array("mensaje" => "El usuario, la mesa o el producto no existen en la base de datos"));
+            $payload = json_encode(array("mensaje" => "El usuario o la mesa no existen en la base de datos"));
             break;
           
           case 1:
             $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
             $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+            $estados = 201;
             Logs::AgregarLogOperacion($usuarioLoguado,"creo un nuevo pedido con el codigo $pedido->codigo para la mesa $pedido->codigoMesa");
             break;
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
 
     public function CargarUno($request, $response, $args)
     {
       $parametros = $request->getParsedBody();
-      $idProducto = $args['id'];
+      $idProducto = $parametros['idProducto'];
       $cantidad = $parametros['cantidad'];
-      $codigoPedido = $parametros['codigoPedido'];
+      $codigoPedido = $args['codigoPedido'];
+      $estados = 400;
 
 
       $payload = json_encode(array("mensaje" => "La cantidad debe ser un numero mayor a cero"));
@@ -82,6 +91,7 @@ class PedidoController extends Pedido implements IApiUsable
             $producto = Producto::ObtenerProducto($idProducto);
             $pedido = Pedido::ObtenerPedido($codigoPedido);
             $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+            $estados = 201;
             Logs::AgregarLogOperacion($usuarioLoguado,"cargo un producto $producto->nombre al pedido con codigo $pedido->codigo para la mesa $pedido->codigoMesa");
             break;  
         }
@@ -89,7 +99,15 @@ class PedidoController extends Pedido implements IApiUsable
     
 
       $response->getBody()->write($payload);
-      return $response->withHeader('Content-Type', 'application/json');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
     
     public function SubirFoto($request, $response, $args)
@@ -97,6 +115,7 @@ class PedidoController extends Pedido implements IApiUsable
       $codigoPedido = $args['codigoPedido'];
       $archivo = $request->getUploadedFiles();
       $foto = $archivo['foto'];
+      $estados = 400;
 
 
       switch(Pedido::SacarFoto($codigoPedido,$foto))
@@ -114,11 +133,20 @@ class PedidoController extends Pedido implements IApiUsable
           $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
           Logs::AgregarLogOperacion($usuarioLoguado,"saco una foto de la mesa con codigo $pedido->codigoMesa para el pedido $pedido->codigo");
           $payload = json_encode(array("mensaje" => "Foto cargada con exito"));
+          $estados = 201;
           break;  
       }
       
       $response->getBody()->write($payload);
-      return $response->withHeader('Content-Type', 'application/json');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
 
     }
 
@@ -127,19 +155,27 @@ class PedidoController extends Pedido implements IApiUsable
         // Buscamos usuario por nombre
         $pedidoCodigo = $args['codigoPedido'];
         $pedido = Pedido::ObtenerPedido($pedidoCodigo);
-
+        $estados = 400;
         $payload = json_encode(array("mensaje" => "Id incorrecto"));
 
         if($pedido != false)
         {
           $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+          $estados = 200;
           Logs::AgregarLogOperacion($usuarioLoguado,"trajo el pedido con codigo $pedido->codigo");
           $payload = Pedido::RetornarUnPedidoString($pedido);
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
 
     public function TraerTodos($request, $response, $args)
@@ -154,6 +190,7 @@ class PedidoController extends Pedido implements IApiUsable
       $filtro = $args['filtro'];
       $filtro = strtolower($filtro);
       $estadoInt = Pedido::ObtenerEstadoInt($filtro);
+      $estados = 400;
       //$payload = json_encode(array("listaUsuario" => $lista));
 
       if($formatoFecha)
@@ -171,6 +208,8 @@ class PedidoController extends Pedido implements IApiUsable
             $listaPedidos = Pedido::ObtenerTodosLosPedidosPorFecha($fechaInicio,$fechaFinal);
           }
 
+          $estados = 200;
+
           $payload = Pedido::RetornarListaDePedidosString($listaPedidos,$estadoInt); 
           if($payload != false)
           {            
@@ -180,7 +219,6 @@ class PedidoController extends Pedido implements IApiUsable
               $fechaInicio == "" && $fechaFinal == "" ?
               $listaPedidos = Pedido::ObtenerTodosLosPedidosPorEstado($estadoInt) :
               $listaPedidos = Pedido::ObtenerTodosLosPedidosPorFechaYEstado($fechaInicio,$fechaFinal,$estadoInt);
-              
               GestionarArchivos($parametros['descarga'], $payload,$listaPedidos ,"pedidos$filtro");
             }
           }
@@ -195,8 +233,15 @@ class PedidoController extends Pedido implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerPedidosListos($request, $response, $args)
@@ -204,8 +249,11 @@ class PedidoController extends Pedido implements IApiUsable
       $usuarioLogueado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $listaPedidos = Pedido::ObtenerTodosLosPedidosPorEmpleado($usuarioLogueado->GetID());      
       $payload = Pedido::RetornarListaDePedidosString($listaPedidos,TERMINADO); 
+      $estados = 400;
+
       if($payload != false)
       {            
+        $estados = 200;
         $payload .= "Todos los pedidos terminados atendidos por usted $usuarioLogueado->nombre $usuarioLogueado->apellido";
         Logs::AgregarLogOperacion($usuarioLogueado,"trajo los pedidos listos para servir de su propiedad");
       }
@@ -215,8 +263,15 @@ class PedidoController extends Pedido implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');    
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerTodosProductosPedidos($request, $response, $args)
@@ -226,22 +281,35 @@ class PedidoController extends Pedido implements IApiUsable
       $filtro = $args['filtro'];
       $filtro = strtolower($filtro);
       $estadoInt = Pedido::ObtenerEstadoInt($filtro);
+      $estados = 400;
 
       $payload = json_encode(array("mensaje" => "No se ingreso un estado válido"));
       
       if($estadoInt != -3)
       {
+        $estados = 200;
+
         $payload = Pedido::RetornarListaDePedidosConProductosString($listaPedidos,$usuarioLoguado,$estadoInt);
         if($payload == false)
         {
+          $estados = 400;
           $payload = "<h2>No hay productos para el estado $filtro<h2>";
         }
         $payload .= "<h3>Mostre todos los productos en estado $filtro que el usuario $usuarioLoguado->nombre $usuarioLoguado->apellido  puede ver<h3>";
+        Logs::AgregarLogOperacion($usuarioLogueado,"Pidio todos los productos con sus pedidos en estado $filtro ");
+
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function ServirUnPedido($request, $response, $args)
@@ -255,6 +323,7 @@ class PedidoController extends Pedido implements IApiUsable
       $listaPedidos = Pedido::ObtenerTodosLosPedidosPorEmpleado($usuarioLogueado->GetID());      
       $listaMesas = Mesa::ObtenerTodasLasMesas();      
       $payload = json_encode(array("mensaje" => "La mesa o el pedido no existen o no se encuentran listos para servir"));
+      $estados = 400;
 
       if($mesa != false && $pedido != false)
       {
@@ -271,13 +340,21 @@ class PedidoController extends Pedido implements IApiUsable
           case 1:
             $payload = json_encode(array("mensaje" => "Pedido servido con éxito"));
             Logs::AgregarLogOperacion($usuarioLogueado,"Sirvio exitosamente el pedido con el codigo $pedido->codigo");
+            $estados = 201;
             break;
         }
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');    
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
     
     public function TraerLoQueMasVendio($request, $response, $args)
@@ -289,6 +366,7 @@ class PedidoController extends Pedido implements IApiUsable
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $listaProductos = Producto::ObtenerTodosLosProductos();
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
@@ -302,7 +380,8 @@ class PedidoController extends Pedido implements IApiUsable
           : $payload = "El producto más vendido fue <br><br>";
           $payload .= Producto::RetornarListaDeProductosString($productosMasVendidos,"","");
           $payload .= "<br>La cantidad vendida fue de $maximo unidades<br>";
-  
+          
+          $estados = 200;
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos mas vendidos");
           if(isset($parametros['descarga']))
           {
@@ -317,8 +396,15 @@ class PedidoController extends Pedido implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerLoQueMenosVendio($request, $response, $args)
@@ -330,6 +416,7 @@ class PedidoController extends Pedido implements IApiUsable
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $listaProductos = Producto::ObtenerTodosLosProductos();
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
@@ -344,6 +431,7 @@ class PedidoController extends Pedido implements IApiUsable
           $payload .= Producto::RetornarListaDeProductosString($productosMenosVendidos,"","");
           $payload .= "<br>La cantidad vendida fue de $minimo unidades<br>";
   
+          $estados = 200;
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los productos menos vendidos");
         
           if(isset($parametros['descarga']))
@@ -358,8 +446,15 @@ class PedidoController extends Pedido implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
     
     public function TraerLosNoEntregadosATiempo($request, $response, $args)
@@ -370,7 +465,8 @@ class PedidoController extends Pedido implements IApiUsable
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
-      
+      $estados = 400;
+
       if($formatoFecha)
       {
         if($fechaInicio == "" && $fechaFinal == "")
@@ -385,9 +481,16 @@ class PedidoController extends Pedido implements IApiUsable
         $payload = Pedido::RetornarListaDePedidosString($listaPedidosNoEntregadosATiempo,ENTREGADO);
         $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
         
-        $payload != false ? Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los pedidos no entregados a tiempo")
-        : $payload = "<h1>No hay ningun pedido que no sea haya entregado a tiempo<h1>";
-        
+        if($payload != false)
+        {
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre el/los pedidos no entregados a tiempo");
+          $estados = 200;
+        }
+        else
+        {
+          $payload = "<h1>No hay ningun pedido que no sea haya entregado a tiempo<h1>";
+        }
+
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
 
@@ -398,8 +501,15 @@ class PedidoController extends Pedido implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerProductosMasVendidoAMenosVendido($request, $response, $args)
@@ -410,6 +520,7 @@ class PedidoController extends Pedido implements IApiUsable
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
@@ -419,6 +530,7 @@ class PedidoController extends Pedido implements IApiUsable
         if($listaProductos != false && count($listaProductos) > 0)
         {
           $payload = Producto::RetornarListaDeProductosString($listaProductos,$fechaInicio,$fechaFinal);
+          $estados = 200;
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre todos los productos ordenados por cantidad de ventas");
         }
         
@@ -427,8 +539,15 @@ class PedidoController extends Pedido implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function CambiarEstadoUno($request, $response, $args)
@@ -440,10 +559,10 @@ class PedidoController extends Pedido implements IApiUsable
         isset($parametros['tiempoDePreparacion']) ? $tiempoDePreparacion = $parametros['tiempoDePreparacion']
         : $tiempoDePreparacion = 0;
         $payload = json_encode(array("mensaje" => "No se pudo modificar el estado, revise que los datos ingresados sean correctos"));          
-        $response->withStatus(401);
         $pedido = Pedido::ObtenerPedido($codigoPedido);
         $producto = Producto::ObtenerProducto($idProducto);
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
+        $estados = 400;
 
         if($pedido != false && $producto != false && is_numeric($tiempoDePreparacion))
         {
@@ -460,9 +579,9 @@ class PedidoController extends Pedido implements IApiUsable
             {  
               $payload = json_encode(array("mensaje" => "No se modifico porque el usuario no tiene acceso a ese producto. Usted esta logueado como $usuarioLoguado->rol y deberia ser $producto->rol"));          
 
-              if($producto->GetRol() == $usuarioLoguado->GetRol() || $usuarioLoguado->GetTipo() == "socio")
+              if(($producto->GetRol() == $usuarioLoguado->GetRol() || ($producto->GetEstado() == TERMINADO && $usuarioLoguado->GetRol() == "mozo")) || $usuarioLoguado->GetTipo() == "socio")
               {
-                $payload = json_encode(array("mensaje" => "Sólo el mozo o el socio puede servir el producto"));          
+                $payload = json_encode(array("mensaje" => "El producto ya está entregado"));          
 
                 if($estadoInt != ENTREGADO || $usuarioLoguado->GetTipo() == "socio")
                 {
@@ -472,9 +591,8 @@ class PedidoController extends Pedido implements IApiUsable
                   {
                     $payload = json_encode(array("mensaje" => "Se modifico el estado exitosamente"));          
                     Logs::AgregarLogOperacion($usuarioLoguado,"modifico el estado del producto con id $producto->id perteneciente al pedido con codigo $pedido->codigo a $estado");
+                    $estados = 200;
                   }
-
-                  $response->withStatus(200);
                 }
               }
             }
@@ -482,8 +600,15 @@ class PedidoController extends Pedido implements IApiUsable
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
     
     public function ModificarUno($request, $response, $args)
@@ -499,12 +624,28 @@ class PedidoController extends Pedido implements IApiUsable
 
     public function BorrarUno($request, $response, $args)
     {
+        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
         $parametros = $request->getParsedBody();
+        $codigoPedido = $args['codigoPedido'];
+        $payload = json_encode(array("mensaje" => "Hubo un error al eliminar el pedido"));
+        $estados = 400;
 
-        $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
+        if(Pedido::DarDeBajaUnPedido($codigoPedido))
+        {
+          json_encode(array("mensaje" => "Pedido eliminado con exito"));
+          Logs::AgregarLogOperacion($usuarioLoguado,"Borro el pedido con código $codigoPedido");
+          $estados = 200;
+        }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+        
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
 }

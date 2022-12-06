@@ -224,6 +224,20 @@ class Pedido
 		return $retorno;
 	}
 
+	public static function DarDeBajaUnPedido($codigoPedido)
+	{
+		$retorno=0;
+		$pedido = Pedido::ObtenerPedido($codigoPedido);
+
+		if($pedido != false)
+		{
+			$retorno=1;
+			$pedido->BorrarPedidoDatabase();
+		}
+
+		return $retorno;
+	}
+
 
 	public static function SacarFoto($codigoPedido,$foto)
 	{
@@ -365,13 +379,12 @@ class Pedido
 		$retorno = 0;
 		$ubicacionFinal = $destino . $nombreArchivo . "." . $extension;
 
-		if (!file_exists($ubicacionFinal)) 
+		if (count(glob($destino . $nombreArchivo . "*")) == 0)  
 		{
 			$this->SubirArchivo($origen,$destino,$nombreArchivo,$extension);
 			$this->GuardarFoto($origen,$destino);
 			$retorno = 1;
 		}
-
 		return $retorno;
 	}
 
@@ -743,7 +756,21 @@ class Pedido
     public function AgregarPedidoDatabase()
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
-       $consulta = $objetoAccesoDato->prepararConsulta("INSERT into pedidos (codigoMesa,idUsuario,horaInicio,horaFinal,estado,codigo)values('$this->codigoMesa','$this->idUsuario','$this->horaInicio','$this->horaFinal','$this->estado','$this->codigo')");
+
+	   $consulta = $objetoAccesoDato->prepararConsulta("INSERT into pedidos (codigoMesa,idUsuario,horaInicio,horaFinal,estado,codigo)values('$this->codigoMesa','$this->idUsuario','$this->horaInicio',NULL,'$this->estado','$this->codigo')");
+
+	   if(isset($this->horaFinal))
+	   {
+		$consulta = $objetoAccesoDato->prepararConsulta("INSERT into pedidos (codigoMesa,idUsuario,horaInicio,horaFinal,estado,codigo)values('$this->codigoMesa','$this->idUsuario','$this->horaInicio','$this->horaFinal','$this->estado','$this->codigo')");
+	   }
+
+       $consulta->execute();
+    }
+
+	public function BorrarPedidoDatabase()
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+       $consulta = $objetoAccesoDato->prepararConsulta("DELETE FROM pedidos WHERE codigo = '$this->codigo'");
        $consulta->execute();
     }
 

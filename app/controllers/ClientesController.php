@@ -21,6 +21,7 @@ class ClientesController
     public function DarOpinion($request, $response, $args)
     {
         $parametros = $request->getParsedBody();
+        $estados = 201;
 
         $codigoMesa = $parametros['codigoMesa'];
         $codigoPedido = $parametros['codigoPedido'];
@@ -35,6 +36,7 @@ class ClientesController
         {
           $opinion = Opinion::ConstruirOpinion(0,$codigoMesa,$codigoPedido,$notaCocinero,$notaMesa,$notaMozo,$notaRestaurante,$comentario);
           $listaOpiniones = Opinion::ObtenerTodasLasOpiniones();
+          $estados = 400;
 
           switch(Opinion::AltaOpinion($listaOpiniones,$opinion))
           {
@@ -60,13 +62,15 @@ class ClientesController
             
             case 1:
               $payload = json_encode(array("mensaje" => "Opinión enviada con exito"));
+              $estados = 201;
               break;
           }
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        return $response->withStatus($estados);
+
     }
 
     public function TraerTiempoDemora($request, $response, $args)
@@ -76,6 +80,7 @@ class ClientesController
       $codigoPedido = $_GET['codigoPedido'];
       $mesa = Mesa::ObtenerMesa($codigoMesa);
       $pedido = Pedido::ObtenerPedido($codigoPedido);
+      $estados = 400;
       
       $payload = json_encode(array("mensaje" => "Hubo un error al extraer la informacion"));
 
@@ -84,6 +89,7 @@ class ClientesController
         $payload = json_encode(array("mensaje" => "El pedido no existe"));
         if($pedido != false)
         {
+          $estados = 200;
           $payload = "<h2>Tiempo de demora para el pedido con el código $codigoPedido correspondiente a la mesa con código $codigoMesa:<h2>";
           $payload .= Pedido::RetornarTiempoDemora($pedido);
         }
@@ -93,8 +99,15 @@ class ClientesController
         $payload = json_encode(array("mensaje" => "La mesa no existe"));
       }
     
-
       $response->getBody()->write($payload);
-      return $response->withHeader('Content-Type', 'application/json');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 }

@@ -214,7 +214,7 @@ class Opinion
                 if($pedido != false)
                 {
                     $retorno = -1;
-                    if($pedido->GetEstado() == TERMINADO)
+                    if($pedido->GetEstado() == TERMINADO || $pedido->GetEstado() == ENTREGADO)
                     {
                         $retorno = 0;
                         if(Opinion::VerificarOpiniones($listaOpiniones,$opinion))
@@ -401,8 +401,8 @@ class Opinion
 	{
 		$retorno=array();
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, codigoMesa,codigoPedido,notaMesa,notaRestaurante,notaMozo,notaCocinero,comentario FROM calificaciones WHERE codigoMesa = '$codigoMesa' AND notaMesa = (SELECT $filtro(notaMesa) FROM calificaciones);");
-       	if($consulta->execute())
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT id, codigoMesa,codigoPedido,notaMesa,notaRestaurante,notaMozo,notaCocinero,comentario FROM calificaciones WHERE codigoMesa = '$codigoMesa' AND notaMesa = (SELECT $filtro(notaMesa) FROM calificaciones WHERE codigoMesa = '$codigoMesa');");
+		if($consulta->execute())
 		{
 			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Opinion');
 	   	}

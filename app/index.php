@@ -127,7 +127,7 @@ $app->group('/productos', function (RouteCollectorProxy $group)
     $group->post('/crearProducto',\ProductoController::class . ':CargarUno');
     $group->get('/listarProductos',\ProductoController::class . ':TraerTodos');
     $group->get('/listarUno/{id}', \ProductoController::class . ':TraerUno');
-    $group->delete('/borrarUno',\ProductoController::class . ':BorrarUno');
+    $group->delete('/borrarUno/{id}',\ProductoController::class . ':BorrarUno');
     $group->put('/modificarUno',\ProductoController::class . ':ModificarUno');
 })->add(new MWVerificar("socio","todos"));
 
@@ -148,7 +148,7 @@ $app->group('/mesas', function (RouteCollectorProxy $group)
     $group->post('/crearMesa',\MesaController::class . ':CargarUno')->add(new MWVerificar("empleado","mozo"));
     $group->get('/listarMesas',\MesaController::class . ':TraerTodos')->add(new MWVerificar("empleado","mozo"));
     $group->get('/listarUna/{codigoMesa}',\MesaController::class . ':TraerUno')->add(new MWVerificar("empleado","mozo"));
-    $group->delete('/borrarUna',\MesaController::class . ':BorrarUno')->add(new MWVerificar("socio","todos"));
+    $group->delete('/borrarUna/{codigoMesa}',\MesaController::class . ':BorrarUno')->add(new MWVerificar("socio","todos"));
     $group->put('/modificarUna',\MesaController::class . ':ModificarUno')->add(new MWVerificar("empleado","mozo"));
     $group->put('/cambiarEstado/{codigoMesa}',\MesaController::class . ':CambiarEstadoUno')->add(new MWVerificar("empleado","mozo"));
 
@@ -201,7 +201,7 @@ $app->group('/pedidos', function (RouteCollectorProxy $group)
     $group->post('/crearPedido',\PedidoController::class . ':CrearUno')->add(new MWVerificar("empleado","mozo"));
     $group->post('/cargarPedido/{codigoPedido}',\PedidoController::class . ':CargarUno')->add(new MWVerificar("empleado","mozo"));
     $group->post('/subirFoto/{codigoPedido}',\PedidoController::class . ':SubirFoto')->add(new MWVerificar("empleado","mozo"));
-    $group->delete('/borrarUno',\ProductoController::class . ':BorrarUno');
+    $group->delete('/borrarUno/{codigoPedido}',\ProductoController::class . ':BorrarUno');
     $group->put('/modificarUno',\ProductoController::class . ':ModificarUno');
 
     //8-a Lo que más se vendió.

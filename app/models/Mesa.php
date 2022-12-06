@@ -122,6 +122,20 @@ class Mesa
 		return $retorno;
 	}
 
+	public static function DarDeBajaUnaMesa($codigoMesa)
+	{
+		$retorno=0;
+		$mesa = Mesa::ObtenerMesa($codigoMesa);
+
+		if($mesa != false)
+		{
+			$retorno=1;
+			$mesa->BorrarMesaDatabase();
+		}
+
+		return $retorno;
+	}
+
 	public static function CargaForzada($mesas)
 	{
 		$contador = 0;
@@ -383,7 +397,7 @@ class Mesa
 	{
 		$mesas = false;
 
-		if(isset($listaPedidos) && count($listaPedidos) > 0 && count($listaMesas) > 0)
+		if(isset($listaPedidos) && $listaPedidos != false && count($listaPedidos) > 0 && count($listaMesas) > 0)
 		{
 			$mesas = array();
 			foreach ($listaMesas as $mesa) 
@@ -633,6 +647,13 @@ class Mesa
     {
        $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
        $consulta = $objetoAccesoDato->prepararConsulta("INSERT into mesas (codigo,estado,fechaDeCreacion)values('$this->codigo','$this->estado','$this->fechaDeCreacion')");
+       $consulta->execute();
+    }
+
+	public function BorrarMesaDatabase()
+    {
+       $objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+       $consulta = $objetoAccesoDato->prepararConsulta("DELETE FROM mesas WHERE codigo = '$this->codigo'");
        $consulta->execute();
     }
 

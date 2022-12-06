@@ -172,13 +172,18 @@ class Producto
 		$retorno=-1;
 		$lista=Producto::ObtenerTodosLosProductos();
 
-		if(!(is_null($producto->GetNombre()) || is_null($producto->GetTipo()) || is_null($producto->GetRol()) || is_null($producto->GetFechaCreacion()) || is_null($producto->GetPrecio())))
+		if(!(is_null($producto->GetNombre()) || is_null($producto->GetTipo()) || is_null($producto->GetRol()) || is_null($producto->GetFechaCreacion()) || is_null($producto->GetPrecio())) &&
+		($producto->GetNombre() != "" && $producto->GetTipo() != "" && $producto->GetRol() != "" && $producto->GetFechaCreacion() != "" && $producto->GetPrecio() != ""))
 		{
 			$retorno=0;
-			if(($producto->EstaEnLista()))
+			if($producto->VerificarExistenciaID())
 			{
 				$retorno=1;
-				$producto->ModificarProductoDatabase();
+				if(!($producto->EstaEnLista()))
+				{
+					$retorno=2;
+					$producto->ModificarProductoDatabase();
+				}
 			}
 		}
 
@@ -293,7 +298,24 @@ class Producto
 
 		foreach ($lista as $productoAux) 
 		{
-			if($this->Equals($productoAux))
+			if($this->Equals($productoAux)) 
+			{
+				$retorno=1;
+				break;
+			}
+		}
+
+		return $retorno;
+	}
+
+	function VerificarExistenciaID()
+	{
+		$lista = Producto::ObtenerTodosLosProductos();
+		$retorno=0;
+
+		foreach ($lista as $productoAux) 
+		{
+			if($this->GetID() == $productoAux->GetID()) 
 			{
 				$retorno=1;
 				break;
@@ -392,7 +414,6 @@ class Producto
 		return $contador;
 	}
 
-	//Retorna 1 si el usuario ya tiene asignado un mail no disponible o si su id corresponde con otro 0 si existe en la database
 	public static function VerificarExistencia($producto)
 	{
 		$listaProductos = Producto::ObtenerTodosLosProductos();

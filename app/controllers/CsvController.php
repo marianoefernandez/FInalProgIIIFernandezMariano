@@ -25,7 +25,7 @@ class CsvController
         $lista = LeerCSV();
         $retornoCarga = 0;
         $cantidadElementosLista = 0;
-        $estados = 200;
+        $estados = 400;
 
         if(isset($lista))
         {
@@ -61,10 +61,15 @@ class CsvController
 
             if($payload != false)
             {
-                $retornoCarga > 0 ? 
-                $payload = "<h2>Se cargaron datos de $filtro <h2><br> <h3>Se cargaron con exito $retornoCarga de $cantidadElementosLista $filtro<h3>" :
-                $payload = "<h2>No se pudo cargar ni un dato de $filtro <h2><br> <h3>Se cargaron con exito $retornoCarga de $cantidadElementosLista $filtro<h3>";
-        
+                if($retornoCarga > 0)
+                {
+                    $payload = "<h2>Se cargaron datos de $filtro <h2><br> <h3>Se cargaron con exito $retornoCarga de $cantidadElementosLista $filtro<h3>";
+                    $estados = 200;
+                }
+                else
+                {
+                    $payload = "<h2>No se pudo cargar ni un dato de $filtro <h2><br> <h3>Se cargaron con exito $retornoCarga de $cantidadElementosLista $filtro<h3>";       
+                }
             }
             else
             {

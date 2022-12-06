@@ -16,9 +16,11 @@ class LogLoginController extends Logs
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $usuarioId = $args['id'];
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
+        $estados = 200;
         if($fechaInicio == "" || $fechaFinal == "")
         {
           $listaLog = Logs::ObtenerLogsLoginPorId($usuarioId);
@@ -40,8 +42,15 @@ class LogLoginController extends Logs
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'application/json');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerTodos($request, $response, $args)
@@ -51,9 +60,11 @@ class LogLoginController extends Logs
       $fechaFinal = $parametros['fechaFinal'];
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
+        $estados = 200;
         if($fechaInicio == "" || $fechaFinal == "")
         {
           $listaLog = Logs::ObtenerLogsLogin();
@@ -74,8 +85,15 @@ class LogLoginController extends Logs
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+      
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 }
     

@@ -16,6 +16,7 @@ class MesaController extends Mesa implements IApiUsable
         $payload = json_encode(array("mensaje" => "Hubo un error al crear la mesa"));
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
         $fechaDeCreacion = $parametros['fechaDeCreacion'];
+        $estados = 400;
 
         
         if(isset($fechaDeCreacion) || $fechaDeCreacion == "")
@@ -23,19 +24,19 @@ class MesaController extends Mesa implements IApiUsable
           $fechaDeCreacion = date("Y-m-d");  
         }
 
-
         // Creamos la mesa
         $mesa = Mesa::ConstruirMesa(CERRADA,$fechaDeCreacion);
 
         if(Mesa::AltaMesa($mesa))
         {
+          $estados = 201;
           $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
           Logs::AgregarLogOperacion($usuarioLoguado,"dio de alta la mesa con codigo $mesa->codigo");
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        return $response->withStatus($estados);
     }
 
     public function TraerUno($request, $response, $args)
@@ -45,20 +46,28 @@ class MesaController extends Mesa implements IApiUsable
 
         $mesaCodigo = $args['codigoMesa'];
         $mesa = Mesa::ObtenerMesa($mesaCodigo);
-
+        $estados = 400;
         $payload = json_encode(array("mensaje" => "La mesa no existe"));
 
         if($mesa != false)
         {
-            $mesaAux = array();
-            array_push($mesaAux,$mesa);
-            $payload = Mesa::RetornarListaDeMesasString($mesaAux);
-            Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre la mesa con codigo $mesa->codigo");
+          $estados = 200;
+          $mesaAux = array();
+          array_push($mesaAux,$mesa);
+          $payload = Mesa::RetornarListaDeMesasString($mesaAux);
+          Logs::AgregarLogOperacion($usuarioLoguado,"pidio información sobre la mesa con codigo $mesa->codigo");
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
 
     public function TraerMesasMasUsadas($request, $response, $args)
@@ -69,7 +78,8 @@ class MesaController extends Mesa implements IApiUsable
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
-      
+      $estados = 400;
+
       if($formatoFecha)
       {
         $payload = json_encode(array("mensaje" => "No se encontraron pedidos en la lista"));
@@ -85,7 +95,8 @@ class MesaController extends Mesa implements IApiUsable
           $payload .= Mesa::RetornarListaDeMesasString($mesasMasUsadas);
           count($mesasMasUsadas) > 1 ? $payload .= "<br>Las mismas tienen $maximo pedidos dados de alta<br>"
           : $payload .= "<br>La misma tiene $maximo pedidos dados de alta<br>";
-          
+          $estados = 200;
+
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas usadas");
           
           if(isset($parametros['descarga']))
@@ -101,8 +112,15 @@ class MesaController extends Mesa implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerMesasMenosUsadas($request, $response, $args)
@@ -113,6 +131,7 @@ class MesaController extends Mesa implements IApiUsable
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
@@ -129,6 +148,8 @@ class MesaController extends Mesa implements IApiUsable
           $payload .= Mesa::RetornarListaDeMesasString($mesasMenosUsadas);
           count($mesasMenosUsadas) > 1 ? $payload .= "<br>Las mismas tienen $minimo pedidos dados de alta<br>"
           : $payload .= "<br>La misma tiene $minimo pedidos dados de alta<br>";
+          
+          $estados = 200;
 
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas menos usadas");
         
@@ -144,8 +165,15 @@ class MesaController extends Mesa implements IApiUsable
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
       }
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     
@@ -157,6 +185,7 @@ class MesaController extends Mesa implements IApiUsable
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
@@ -173,6 +202,7 @@ class MesaController extends Mesa implements IApiUsable
           count($mesasQueMasRecaudaron) > 1 ? $payload .= "<br>Las mismas recaudaron $$maximo<br>"
           : $payload .= "<br>La misma recaudo $$maximo<br>";
   
+          $estados = 200;
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas dinero recaudaron");
         
           if(isset($parametros['descarga']))
@@ -187,18 +217,26 @@ class MesaController extends Mesa implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerMesasQueMenosRecaudaron($request, $response, $args)
     {
-        $parametros = $request->getParsedBody();
-        $fechaInicio = $parametros['fechaInicio'];
-        $fechaFinal = $parametros['fechaFinal'];
-        $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
-        $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
-        $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $parametros = $request->getParsedBody();
+      $fechaInicio = $parametros['fechaInicio'];
+      $fechaFinal = $parametros['fechaFinal'];
+      $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
+      $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
+      $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
@@ -215,6 +253,7 @@ class MesaController extends Mesa implements IApiUsable
           count($mesasQueMenosRecaudaron) > 1 ? $payload .= "<br>Las mismas recaudaron $$minimo<br>"
           : $payload .= "<br>La misma recaudo $$minimo<br>";
   
+          $estados = 200;
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas mas dinero recaudaron");
         
           if(isset($parametros['descarga']))
@@ -230,8 +269,14 @@ class MesaController extends Mesa implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerMesasOrdenadasPorRecaudacion($request, $response, $args)
@@ -242,24 +287,34 @@ class MesaController extends Mesa implements IApiUsable
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
         $listaMesas = Mesa::ObtenerMesasOrdenadasPorRecaudacion($fechaInicio,$fechaFinal);
-      
+        $payload = json_encode(array("mensaje" => "No hay mesas dadas de alta"));
+
         if($listaMesas != false && count($listaMesas) > 0)
         {
           $payload = Mesa::RetornarListaDeMesasConRecaudacionString($listaMesas,$fechaInicio,$fechaFinal);
   
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas ordenadas por recaudacion");
+          $estaodos = 200;
         }
         $fechaInicio == "" || $fechaFinal == "" ? $payload .= "Se tuvieron en cuenta todas las fechas" 
         : $payload .= "Se tuvo en cuenta entre el $fechaInicio al $fechaFinal ";
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
 
@@ -271,6 +326,7 @@ class MesaController extends Mesa implements IApiUsable
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
@@ -279,6 +335,7 @@ class MesaController extends Mesa implements IApiUsable
         $maximo = Pedido::ObtenerMayorRecaudacion($listaPedidos);
         $pedidosMayorRecaudacion = Pedido::RetornarPedidosPorRecaudacion($listaPedidos,$maximo);
         $mesasFacturaMayor = Mesa::RetornarMesasAsignadasAPedidos($pedidosMayorRecaudacion,$listaMesas);
+        $payload = json_encode(array("mensaje" => "No se encontraron mesas"));
 
         if($mesasFacturaMayor != false && count($mesasFacturaMayor) > 0 && $pedidosMayorRecaudacion != false && count($pedidosMayorRecaudacion) > 0)
         {
@@ -288,6 +345,7 @@ class MesaController extends Mesa implements IApiUsable
           $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMayor);
           $payload .= "<br>La factura fue de $$maximo<br>";
   
+          $estados = 200;
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura mas cara");
           
           if(isset($parametros['descarga']))
@@ -303,8 +361,15 @@ class MesaController extends Mesa implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerMesasConFacturaMenor($request, $response, $args)
@@ -315,6 +380,7 @@ class MesaController extends Mesa implements IApiUsable
       $usuarioLoguado = UsuarioController::TraerUsuarioActual($request,$response,$args);
       $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
       $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+      $estados = 400;
 
       if($formatoFecha)
       {
@@ -323,6 +389,7 @@ class MesaController extends Mesa implements IApiUsable
         $minimo = Pedido::ObtenerMenorRecaudacion($listaPedidos);
         $pedidosMenorRecaudacion = Pedido::RetornarPedidosPorRecaudacion($listaPedidos,$minimo);
         $mesasFacturaMenor = Mesa::RetornarMesasAsignadasAPedidos($pedidosMenorRecaudacion,$listaMesas);
+        $payload = json_encode(array("mensaje" => "No se encontraron mesas"));
 
         if($mesasFacturaMenor != false && count($mesasFacturaMenor) > 0 && $pedidosMenorRecaudacion != false && count($pedidosMenorRecaudacion) > 0)
         {
@@ -331,6 +398,8 @@ class MesaController extends Mesa implements IApiUsable
           : $payload = "La mesa que tuvo la factura menor fue <br><br>";
           $payload .= Mesa::RetornarListaDeMesasString($mesasFacturaMenor);
           $payload .= "<br>La factura fue de $$minimo<br>";
+          
+          $estados = 200;
           Logs::AgregarLogOperacion($usuarioLoguado,"pidio informacion sobre la/las mesas que emitieron la factura mas barata");
         
           if(isset($parametros['descarga']))
@@ -346,8 +415,15 @@ class MesaController extends Mesa implements IApiUsable
       }
 
       $response->getBody()->write($payload);
-      return $response
-        ->withHeader('Content-Type', 'text/html');
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function TraerRecaudacionEntreFechas($request, $response, $args)
@@ -361,6 +437,7 @@ class MesaController extends Mesa implements IApiUsable
         $formatoFecha = ValidarFechas($fechaInicio,$fechaFinal);
         $mesa = Mesa::ObtenerMesa($mesaCodigo);
         $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
+        $estados = 400;
 
         if($formatoFecha)
         {
@@ -381,6 +458,8 @@ class MesaController extends Mesa implements IApiUsable
                   $facturacion = number_format($facturacion, 2, '.', '');
                   $payload = ("<h2>La mesa con código $mesa->codigo facturo $$facturacion entre el $fechaInicio hasta el $fechaFinal<h2>");                          
                 }
+
+                $estados = 200;
                 Logs::AgregarLogOperacion($usuarioLoguado,"pidio la facturación de la mesa con codigo $mesa->codigo entre las fechas $fechaInicio y $fechaFinal");
                 
                 if(isset($parametros['descarga']))
@@ -393,8 +472,15 @@ class MesaController extends Mesa implements IApiUsable
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
 
     public function TraerTodos($request, $response, $args)
@@ -422,13 +508,27 @@ class MesaController extends Mesa implements IApiUsable
 
     public function BorrarUno($request, $response, $args)
     {
-        $parametros = $request->getParsedBody();
+      $parametros = $request->getParsedBody();
+      $codigoMesa = $args['codigoMesa'];
+      $payload = json_encode(array("mensaje" => "Hubo un error al eliminar la mesa"));
+      $estados = 400;
 
-        $payload = json_encode(array("mensaje" => "Mesa borrada con exito"));
+      if(Mesa::DarDeBajaUnaMesa($codigoMesa))
+      {
+        $payload = json_encode(array("mensaje" => "Mesa eliminada con éxito"));
+        $estados = 200;
+      }
 
-        $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+      $response->getBody()->write($payload);
+
+      if($estados == 200)
+      {
+          return $response->withHeader('Content-Type', 'application/json');
+      }
+      else
+      {
+          return $response->withStatus($estados);
+      }
     }
 
     public function CambiarEstadoUno($request, $response, $args)
@@ -437,8 +537,7 @@ class MesaController extends Mesa implements IApiUsable
         $parametros = $request->getParsedBody();
         $estado = $parametros['estado'];
         $payload = json_encode(array("mensaje" => "No se pudo modificar el estado, codigo mesa incorrecto"));          
-        $response->withStatus(401);
-
+        $estados = 400;
         $mesa = Mesa::ObtenerMesa($codigoMesa);
         $usuarioLoguado = MesaController::TraerUsuarioActual($request,$response,$args);
 
@@ -447,7 +546,7 @@ class MesaController extends Mesa implements IApiUsable
           $estado = strtolower($estado);
           $estadoInt = Mesa::ObtenerEstadoInt($estado);
 
-          if($estadoInt != -3)
+          if($estadoInt != -2)
           {
             $payload = json_encode(array("mensaje" => "No se modifico porque el estado de la mesa ya estaba como " . $estado));          
         
@@ -457,6 +556,7 @@ class MesaController extends Mesa implements IApiUsable
   
               if($mesa->GetEstado() > -1 || $usuarioLoguado->GetTipo() == "socio")
               {
+                $estados = 201;
                 Mesa::CambiarEstadoMesa($mesa,$estadoInt);
 
                 $payload = json_encode(array("mensaje" => "El estado de la mesa se modifico con exito y paso a ser " . $estado));          
@@ -478,8 +578,15 @@ class MesaController extends Mesa implements IApiUsable
         }
 
         $response->getBody()->write($payload);
-        return $response
-          ->withHeader('Content-Type', 'application/json');
+
+        if($estados == 200)
+        {
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+        else
+        {
+            return $response->withStatus($estados);
+        }
     }
 
     public static function TraerUsuarioActual($request, $response, $args)    
