@@ -192,12 +192,16 @@ class Pedido
 			$retorno = 0;
 			if(count($listaMesas) > 0 && $pedido != false && $mesa != false && $mesa->GetEstado() != "CERRADA")
 			{
-				$pedido->SetEstado(ENTREGADO);
-				$mesa->SetEstado(COMIENDO);
-				$pedido->EntregarPedidoDatabase();
-				$pedido->ModificarHoraFinalDatabase(date("Y-m-j H:i:s"));
-				$mesa->CambiarEstadoMesaDatabase($mesa->GetEstado());
 				$retorno = 1;
+				if($pedido->GetEstado() != ENTREGADO)
+				{
+					$pedido->SetEstado(ENTREGADO);
+					$mesa->SetEstado(COMIENDO);
+					$pedido->EntregarPedidoDatabase();
+					$pedido->ModificarHoraFinalDatabase(date("Y-m-j H:i:s"));
+					$mesa->CambiarEstadoMesaDatabase($mesa->GetEstado());
+					$retorno = 2;
+				}
 			}
 		}
 
@@ -636,11 +640,10 @@ class Pedido
 	public function CalcularTiempoDeRestante()
 	{
 		$retorno = "Pendiente";
-		$horaInicio = $this->GetHoraInicio();
-		$horaFinal = $this->GetHoraFinal();
+		$horaFinal = new DateTime($this->ObtenerHoraMayor()["hora"]);
 		$horaActual = new DateTime(date("Y-m-j H:i:s"));
 
-		if(isset($horaInicio) && isset($horaFinal))
+		if(isset($horaFinal))
 		{
 			$retorno = $horaFinal->getTimestamp() - $horaActual->getTimestamp() > 0 ? $horaFinal->getTimestamp() - $horaActual->getTimestamp() . " segundos" : "Aguarde un momento el pedido está tardando más de lo estimado";
 		}
@@ -993,6 +996,16 @@ class Pedido
 		$objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
 		$consulta = $objetoAccesoDato->prepararConsulta("UPDATE pedprod SET estado = 2 WHERE codigoPedido = '$this->codigo'");
 		$consulta->execute();
+	}
+
+	public function ObtenerHoraMayor()
+	{
+		$this->ModificarEstadoDatabase();
+		$objetoAccesoDato = AccesoDatos::obtenerInstancia(); 
+		$consulta = $objetoAccesoDato->prepararConsulta("SELECT MAX(horaFinal) hora from pedprod WHERE codigoPedido = '$this->codigo';");
+		$consulta->execute();
+		$retorno = $consulta->fetchAll(PDO::FETCH_ASSOC);
+		return $retorno[0];
 	}
 
 	public function CalcularTiempoDePreparacion()

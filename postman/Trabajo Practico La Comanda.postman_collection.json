@@ -1,0 +1,5524 @@
+{
+	"info": {
+		"_postman_id": "7b665aff-b227-46b9-9dce-56b45be9fa89",
+		"name": "Trabajo Practico La Comanda",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17206727"
+	},
+	"item": [
+		{
+			"name": "Usuarios",
+			"item": [
+				{
+					"name": "Crear Usuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nombre",
+									"value": "Jose",
+									"type": "text"
+								},
+								{
+									"key": "apellido",
+									"value": "Lopez",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "josesito@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "tipo",
+									"value": "empleado",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "cervecero",
+									"type": "text"
+								},
+								{
+									"key": "inicioActividades",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/crearUsuario",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"crearUsuario"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"postman.setEnvironmentVariable(\"token\",  JSON.parse(responseBody).token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "octaviovillegas@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "1234",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Usuarios",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/listarUsuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"listarUsuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar un Usuario",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/listarUsuario/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"listarUsuario",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Log Login de un Usuario",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/horariosLogin/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"horariosLogin",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Log Login de todos los usuarios",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/horariosLogin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"horariosLogin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Log Operaciones por rol",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/logOperacionesSector/socio",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"logOperacionesSector",
+								"socio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Log Operaciones por rol por empleado",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/socio",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"logOperacionesPorEmpleado",
+								"socio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Log Operaciones por id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/logOperacionesId/10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"logOperacionesId",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar estado de un Usuario",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "estado",
+									"value": "activo",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/cambiarEstado/10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"cambiarEstado",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modificar datos del usuario",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "nombre",
+									"value": "Jose",
+									"type": "text"
+								},
+								{
+									"key": "apellido",
+									"value": "López",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "octaviovillegas@gmail.com\n",
+									"type": "text"
+								},
+								{
+									"key": "tipo",
+									"value": "empleado",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "bartender",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/modificarUno/6",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"modificarUno",
+								"6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Borrar Usuario (BAJA FISICA)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/borrarUno/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"borrarUno",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Productos",
+			"item": [
+				{
+					"name": "Crear Producto",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nombre",
+									"value": "Daikiri",
+									"type": "text"
+								},
+								{
+									"key": "tipo",
+									"value": "Bebida",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "bartender",
+									"type": "text"
+								},
+								{
+									"key": "precio",
+									"value": "700",
+									"type": "text"
+								},
+								{
+									"key": "fechaDeCreacion",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/productos/crearProducto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos",
+								"crearProducto"
+							],
+							"query": [
+								{
+									"key": null,
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Productos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/productos/listarProductos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos",
+								"listarProductos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar un Producto",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/productos/listarUno/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos",
+								"listarUno",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modificar Producto",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "idProducto",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "nombre",
+									"value": "Milanesa con Papas",
+									"type": "text"
+								},
+								{
+									"key": "tipo",
+									"value": "comida",
+									"type": "text"
+								},
+								{
+									"key": "rol",
+									"value": "cocinero",
+									"type": "text"
+								},
+								{
+									"key": "fechaDeCreacion",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "precio",
+									"value": "1799",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/productos/modificarUno",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos",
+								"modificarUno"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BorrarProducto",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/productos/borrarUno",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos",
+								"borrarUno"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Requiere ser administrador para agregar, modificar y borrar productos, pero no para listar. Cualquier empleado puede ver que productos existen en la comanda."
+		},
+		{
+			"name": "Pedidos",
+			"item": [
+				{
+					"name": "Crear Pedido",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "codigoMesa",
+									"value": "D7YSX",
+									"type": "text"
+								},
+								{
+									"key": "tiempoAproximado",
+									"value": "555",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/pedidos/crearPedido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"crearPedido"
+							]
+						},
+						"description": "Crear Pedido"
+					},
+					"response": []
+				},
+				{
+					"name": "Cargar Pedido",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "idProducto",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "cantidad",
+									"value": "3",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/pedidos/cargarPedido/EPATGA",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"cargarPedido",
+								"EPATGA"
+							],
+							"query": [
+								{
+									"key": "cantidad",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Crear Pedido"
+					},
+					"response": []
+				},
+				{
+					"name": "SacarFotoPedido",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "foto",
+									"type": "file",
+									"src": "/C:/Users/Mariano/Desktop/MEME.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/pedidos/subirFoto/8SR61",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"subirFoto",
+								"8SR61"
+							],
+							"query": [
+								{
+									"key": "cantidad",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Crear Pedido"
+					},
+					"response": []
+				},
+				{
+					"name": "Lo que más se vendió",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/pedidos/masVendidos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"masVendidos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Lo que menos se vendio",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/pedidos/menosVendidos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"menosVendidos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Los no entregados a tiempo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/pedidos/noEntregadosATiempo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"noEntregadosATiempo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Los Cancelados",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/pedidos/traerPedidosPorEstado/cancelado",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"traerPedidosPorEstado",
+								"cancelado"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Borrar Pedidos",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/usuarios/borrarUno/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"borrarUno",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Mesas",
+			"item": [
+				{
+					"name": "Crear Mesa",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fechaDeCreacion",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/mesas/crearMesa",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"crearMesa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar estado de una mesa",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "estado",
+									"value": "cerrada",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/mesas/cambiarEstado/0GI28",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"cambiarEstado",
+								"0GI28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar una mesa",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/listarUna/0GI28",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"listarUna",
+								"0GI28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar todas las mesas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/listarMesas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"listarMesas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mesas más usadas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/masUsada",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"masUsada"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mesas menos usadas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/menosUsada",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"menosUsada"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mesas con mayor recaudacion",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:666/mesas/mayorRecaudacion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"mayorRecaudacion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mesas con menor recaudación",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/menorRecaudacion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"menorRecaudacion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mesas con factura con mayor importe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/facturaMayor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"facturaMayor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mesas con factura con menor importe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/facturaMenor",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"facturaMenor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facturacion de una mesa a partir de una fecha",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fechaInicio",
+									"value": "2022-10-09",
+									"type": "text"
+								},
+								{
+									"key": "fechaFinal",
+									"value": "2022-10-19",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/mesas/facturaEntreDosFechas/0GI28",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"facturaEntreDosFechas",
+								"0GI28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mejores comentarios de una mesa",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/mejoresComentarios/0GI28",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"mejoresComentarios",
+								"0GI28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mejores comentarios de las mesas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/opiniones/mejoresComentarios/notaMesa",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"opiniones",
+								"mejoresComentarios",
+								"notaMesa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Peores comentarios de una mesa",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/mesas/peoresComentarios/0GI28",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"peoresComentarios",
+								"0GI28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Peores comentarios de las mesas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/opiniones/peoresComentarios/notaMesa",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"opiniones",
+								"peoresComentarios",
+								"notaMesa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BorrarMesa",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "id",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/productos/borrarUno",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos",
+								"borrarUno"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "Dar Opinion",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "codigoMesa",
+									"value": "ATI38",
+									"type": "text"
+								},
+								{
+									"key": "codigoPedido",
+									"value": "9JJE4",
+									"type": "text"
+								},
+								{
+									"key": "notaMesa",
+									"value": "7",
+									"type": "text"
+								},
+								{
+									"key": "notaRestaurante",
+									"value": "8",
+									"type": "text"
+								},
+								{
+									"key": "notaCocinero",
+									"value": "9",
+									"type": "text"
+								},
+								{
+									"key": "notaMozo",
+									"value": "9",
+									"type": "text"
+								},
+								{
+									"key": "comentario",
+									"value": "Muy rico todo!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/clientes/darOpinion",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"clientes",
+								"darOpinion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mostrar info con Tiempo de demora",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:666/clientes/mostrarTiempoDemora?codigoMesa=0GI28&codigoPedido=7TQQL",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"clientes",
+								"mostrarTiempoDemora"
+							],
+							"query": [
+								{
+									"key": "codigoMesa",
+									"value": "0GI28"
+								},
+								{
+									"key": "codigoPedido",
+									"value": "7TQQL"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "22 Funcionalidades",
+			"item": [
+				{
+					"name": "1- Una moza toma el pedido de una",
+					"item": [
+						{
+							"name": "Iniciamos sesión como moza",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"postman.setEnvironmentVariable(\"token\",  JSON.parse(responseBody).token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "mariagimenez12@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "clave",
+											"value": "1234",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "La moza crea el pedido",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "codigoMesa",
+											"value": "D7YSX",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/crearPedido",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"crearPedido"
+									]
+								},
+								"description": "Crear Pedido"
+							},
+							"response": []
+						},
+						{
+							"name": "La moza carga una milanesa a caballo",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "codigoPedido",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "cantidad",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/cargarPedido/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"cargarPedido",
+										"5"
+									]
+								},
+								"description": "Crear Pedido"
+							},
+							"response": []
+						},
+						{
+							"name": "La moza carga Dos hamburguesas de garbanzo",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "idProducto",
+											"value": "6",
+											"type": "text"
+										},
+										{
+											"key": "cantidad",
+											"value": "2",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/cargarPedido/MR9JG",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"cargarPedido",
+										"MR9JG"
+									]
+								},
+								"description": "Crear Pedido"
+							},
+							"response": []
+						},
+						{
+							"name": "La moza carga una corona",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "codigoPedido",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "cantidad",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/cargarPedido/7",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"cargarPedido",
+										"7"
+									]
+								},
+								"description": "Crear Pedido"
+							},
+							"response": []
+						},
+						{
+							"name": "La moza carga Un Daikiri",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "codigoPedido",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "cantidad",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/cargarPedido/8",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"cargarPedido",
+										"8"
+									]
+								},
+								"description": "Crear Pedido"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "2- El mozo saca una foto de la mesa y lo relaciona con el pedido.",
+					"item": [
+						{
+							"name": "Sacar foto pedido",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "foto",
+											"type": "file",
+											"src": "/C:/Users/Mariano/Desktop/MEME.png"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/subirFoto/8SR61",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"subirFoto",
+										"8SR61"
+									],
+									"query": [
+										{
+											"key": "cantidad",
+											"value": "",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Crear Pedido"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "3-Cada empleado responsable de cada producto del pedido , debe:",
+					"item": [
+						{
+							"name": "Productos Pendientes del usuario logueado",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/pedidos/traerProductosPedidos/pendiente",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"traerProductosPedidos",
+										"pendiente"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cambiar estado pedido",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "estado",
+											"value": "enpreparacion",
+											"type": "text"
+										},
+										{
+											"key": "idProducto",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "codigoPedido",
+											"value": "7TQQL",
+											"type": "text"
+										},
+										{
+											"key": "tiempoDePreparacion",
+											"value": "300",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/cambiarEstadoProducto",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"cambiarEstadoProducto"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "4- El cliente ingresa el código de la mesa junto con el número de pedido y ve el tiempo de demora de su pedido",
+					"item": [
+						{
+							"name": "Mostrar info con Tiempo de demora",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/clientes/mostrarTiempoDemora?codigoMesa=0GI28&codigoPedido=7TQQL",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"clientes",
+										"mostrarTiempoDemora"
+									],
+									"query": [
+										{
+											"key": "codigoMesa",
+											"value": "0GI28"
+										},
+										{
+											"key": "codigoPedido",
+											"value": "7TQQL"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "5- Alguno de los socios pide el listado de pedidos y el tiempo de demora de ese pedido",
+					"item": [
+						{
+							"name": "Me logueo como socio",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"postman.setEnvironmentVariable(\"token\",  JSON.parse(responseBody).token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "octaviovillegas@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "clave",
+											"value": "1234",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Mostrar Pedidos por filtro especifico",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/pedidos/traerPedidosPorEstado/terminado",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"traerPedidosPorEstado",
+										"terminado"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "6- Cada empleado responsable de cada producto del pedido, debe:",
+					"item": [
+						{
+							"name": "Productos Pendientes del usuario logueado Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/pedidos/traerProductosPedidos/enpreparacion",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"traerProductosPedidos",
+										"enpreparacion"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cambiar estado pedido Copy",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "estado",
+											"value": "terminado",
+											"type": "text"
+										},
+										{
+											"key": "idProducto",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "codigoPedido",
+											"value": "7TQQL",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/cambiarEstadoProducto",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"cambiarEstadoProducto"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "7- La moza se fija los pedidos que están listos para servir , cambia el estado de la mesa",
+					"item": [
+						{
+							"name": "Mostrar Pedidos Terminados",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/traerPedidosListos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"traerPedidosListos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Servir Pedido",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "codigoMesa",
+											"value": "0GI28",
+											"type": "text"
+										},
+										{
+											"key": "codigoPedido",
+											"value": "7TQQL",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/servirPedido",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"servirPedido"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "8- Alguno de los socios pide el listado de las mesas y sus estados .",
+					"item": [
+						{
+							"name": "Listar todas las mesas Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/mesas/listarMesas",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"listarMesas"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "9- La moza cobra la cuenta.",
+					"item": [
+						{
+							"name": "Cobrar cuenta",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "estado",
+											"value": "pagando",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/cambiarEstado/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"cambiarEstado",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "10- Alguno de los socios cierra la mesa",
+					"item": [
+						{
+							"name": "Cerrar mesa",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "estado",
+											"value": "cerrada",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/cambiarEstado/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"cambiarEstado",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "11- El cliente ingresa el código de mesa y el del pedido junto con los datos de la encuesta",
+					"item": [
+						{
+							"name": "Dar Opinion",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "codigoMesa",
+											"value": "ATI38",
+											"type": "text"
+										},
+										{
+											"key": "codigoPedido",
+											"value": "9JJE4",
+											"type": "text"
+										},
+										{
+											"key": "notaMesa",
+											"value": "7",
+											"type": "text"
+										},
+										{
+											"key": "notaRestaurante",
+											"value": "8",
+											"type": "text"
+										},
+										{
+											"key": "notaCocinero",
+											"value": "9",
+											"type": "text"
+										},
+										{
+											"key": "notaMozo",
+											"value": "9",
+											"type": "text"
+										},
+										{
+											"key": "comentario",
+											"value": "Muy rico todo!",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/clientes/darOpinion",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"clientes",
+										"darOpinion"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "12- Alguno de los socios pide los mejores comentarios",
+					"item": [
+						{
+							"name": "Mejores comentarios por filtro especifico",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/opiniones/mejoresComentarios/notaMesa",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"opiniones",
+										"mejoresComentarios",
+										"notaMesa"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "13- Alguno de los socios pide la mesa más usada.",
+					"item": [
+						{
+							"name": "Mesas más usadas",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/masUsada",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"masUsada"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "14- Alguno de los socios pide los pedidos que no se entregaron en el tiempo estipulado.",
+					"item": [
+						{
+							"name": "Los no entregados a tiempo Copy",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/noEntregadosATiempo",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"noEntregadosATiempo"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "15- Alguno de los socios pide los productos de los pedidos que no se entregaron en tiempo y forma",
+					"item": [
+						{
+							"name": "Los no entregados a tiempo Copy",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/noEntregadosATiempo",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"noEntregadosATiempo"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "16- Alguno de los socios pide descargar un pdf con el logo de la empresa.",
+					"item": [
+						{
+							"name": "Descargar Logo",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/descargas/descargarLogo",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"descargas",
+										"descargarLogo"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "17- Alguno de los socios pide la cantidad de operaciones de todos por sector.",
+					"item": [
+						{
+							"name": "Por socios",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesSector/socio",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesSector",
+										"socio"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Por Mozo",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesSector/mozo",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesSector",
+										"mozo"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Por Bartender",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesSector/bartender",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesSector",
+										"bartender"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Por Cocinero",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesSector/cocinero",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesSector",
+										"cocinero"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Todos",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesSector/todos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesSector",
+										"todos"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "18- Alguno de los socios pide la cantidad de operaciones, listada por cada empleado, agrupadas por sector",
+					"item": [
+						{
+							"name": "Por socios",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/socio",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesPorEmpleado",
+										"socio"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Por Mozo",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/mozo",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesPorEmpleado",
+										"mozo"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Por Bartender",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/bartender",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesPorEmpleado",
+										"bartender"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Por Cocinero",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/cocinero",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesPorEmpleado",
+										"cocinero"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Todos",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/todos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesPorEmpleado",
+										"todos"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "19- Alguno de los socios pide un listado del producto ordenado del que más se vendió al que menos se vendió.",
+					"item": [
+						{
+							"name": "Productos ordenados por cantidad de ventas",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/traerProductosMasVendidoAMenosVendido",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"traerProductosMasVendidoAMenosVendido"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "20- Alguno de los socios pide de un empleado los días y horarios que se ingresaron al sistema.",
+					"item": [
+						{
+							"name": "Obtener Log Login de un Usuario",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/horariosLogin/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"horariosLogin",
+										"10"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "21-Alguno de los socios pide un listado de las mesas ordenadas de la que hizo la factura más barata a la más cara.",
+					"item": [
+						{
+							"name": "Mesas ordenadas por facturacion",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/mesasOrdenadasPorRecaudacion",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"mesasOrdenadasPorRecaudacion"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "22-Alguno de los socios pide un listado del producto ordenado del que más se vendió al que menos se vendió.",
+					"item": [
+						{
+							"name": "Facturacion de una mesa a partir de una fecha",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-10-09",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-19",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/facturaEntreDosFechas/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"facturaEntreDosFechas",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Manejo CSV",
+			"item": [
+				{
+					"name": "Carga Forzada de Datos",
+					"item": [
+						{
+							"name": "Cargar Usuarios",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "csv",
+											"type": "file",
+											"src": "/C:/Users/Mariano/Desktop/FInalProgIIIFernandezMariano/csvACargar/usuarios.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/cargaForzadaCSV/usuarios",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"cargaForzadaCSV",
+										"usuarios"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cargar Pedidos",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "csv",
+											"type": "file",
+											"src": "/C:/Users/Mariano/Desktop/FInalProgIIIFernandezMariano/csvACargar/pedidos.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/cargaForzadaCSV/pedidos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"cargaForzadaCSV",
+										"pedidos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cargar Productos",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "csv",
+											"type": "file",
+											"src": "/C:/Users/Mariano/Desktop/FInalProgIIIFernandezMariano/csvACargar/productos.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/cargaForzadaCSV/productos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"cargaForzadaCSV",
+										"productos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cargar Mesas",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "csv",
+											"type": "file",
+											"src": "/C:/Users/Mariano/Desktop/FInalProgIIIFernandezMariano/csvACargar/mesas.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/cargaForzadaCSV/mesas",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"cargaForzadaCSV",
+										"mesas"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cargar Opiniones",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "csv",
+											"type": "file",
+											"src": "/C:/Users/Mariano/Desktop/FInalProgIIIFernandezMariano/csvACargar/comentarios.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/cargaForzadaCSV/opiniones",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"cargaForzadaCSV",
+										"opiniones"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Descarga de CSV Admin",
+					"item": [
+						{
+							"name": "7-Usuarios",
+							"item": [
+								{
+									"name": "7-a- Los días y horarios que se ingresaron al sistema.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/usuarios/horariosLogin",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"usuarios",
+												"horariosLogin"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "7-a- Los días y horarios que se ingresaron al sistema (Por usuario).",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/usuarios/horariosLogin/5",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"usuarios",
+												"horariosLogin",
+												"5"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "7-b- Cantidad de operaciones de todos por sector.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/usuarios/logOperacionesSector/todos",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"usuarios",
+												"logOperacionesSector",
+												"todos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "7-c- Cantidad de operaciones de todos por sector, listada por cada empleado.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/todos",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"usuarios",
+												"logOperacionesPorEmpleado",
+												"todos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "7-d- Cantidad de operaciones de cada uno por separado.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/usuarios/logOperacionesId/5",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"usuarios",
+												"logOperacionesId",
+												"5"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "8-Pedidos",
+							"item": [
+								{
+									"name": "8-a- Lo que más se vendió.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "pdf",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/pedidos/masVendidos",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"pedidos",
+												"masVendidos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "8-b- Lo que menos se vendió.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "pdf",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/pedidos/menosVendidos",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"pedidos",
+												"menosVendidos"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "8-c- Los que no se entregaron en el tiempo estipulado.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "pdf",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/pedidos/noEntregadosATiempo",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"pedidos",
+												"noEntregadosATiempo"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "8-d- Los cancelados.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "pdf",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/pedidos/traerPedidosPorEstado/cancelado",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"pedidos",
+												"traerPedidosPorEstado",
+												"cancelado"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "9-Mesas",
+							"item": [
+								{
+									"name": "9-a- La más usada.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "pdf",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/masUsada",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"masUsada"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-b- La menos usada.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "pdf",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/menosUsada",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"menosUsada"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-c- La que más facturó.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "pdf",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/mayorRecaudacion",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"mayorRecaudacion"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-d- La que menos facturó.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/menorRecaudacion",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"menorRecaudacion"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-e- La/s que tuvo la factura con el mayor importe.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/facturaMayor",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"facturaMayor"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-f- La/s que tuvo la factura con el menor importe.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/facturaMenor",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"facturaMenor"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-g- Lo que facturó entre dos fechas dadas.",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "fechaInicio",
+													"value": "2022-10-09",
+													"type": "text"
+												},
+												{
+													"key": "fechaFinal",
+													"value": "2022-10-19",
+													"type": "text"
+												},
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/facturaEntreDosFechas/0GI28",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"facturaEntreDosFechas",
+												"0GI28"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-h- Mejores comentarios (POR MESA)",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/mejoresComentarios/0GI28",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"mejoresComentarios",
+												"0GI28"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-h- Mejores comentarios (TODAS LAS MESAS)",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/opiniones/mejoresComentarios/notaMesa",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"opiniones",
+												"mejoresComentarios",
+												"notaMesa"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-i- Peores comentarios (POR MESA)",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "descarga",
+													"value": "csv",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:666/mesas/peoresComentarios/0GI28",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"mesas",
+												"peoresComentarios",
+												"0GI28"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "9-i- Peores comentarios (TODAS LAS MESAS)",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": []
+										},
+										"url": {
+											"raw": "http://localhost:666/opiniones/peoresComentarios/notaMesa",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "666",
+											"path": [
+												"opiniones",
+												"peoresComentarios",
+												"notaMesa"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "FIltros admin",
+			"item": [
+				{
+					"name": "7-Usuarios",
+					"item": [
+						{
+							"name": "a- Los días y horarios que se ingresaron al sistema.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/horariosLogin",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"horariosLogin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "a- Los días y horarios que se ingresaron al sistema (Por usuario).",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/horariosLogin/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"horariosLogin",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "b- Cantidad de operaciones de todos por sector.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesSector/todos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesSector",
+										"todos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "c- Cantidad de operaciones de todos por sector, listada por cada empleado.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/todos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesPorEmpleado",
+										"todos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "d- Cantidad de operaciones de cada uno por separado.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesId/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesId",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "e- Posibilidad de dar de alta a nuevos, suspenderlos o borrarlos (DAR DE ALTA)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "nombre",
+											"value": "Eros",
+											"type": "text"
+										},
+										{
+											"key": "apellido",
+											"value": "Gonzalez",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "erosgonzalez66@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "clave",
+											"value": "123456",
+											"type": "text"
+										},
+										{
+											"key": "tipo",
+											"value": "empleado",
+											"type": "text"
+										},
+										{
+											"key": "rol",
+											"value": "bartender",
+											"type": "text"
+										},
+										{
+											"key": "inicioActividades",
+											"value": "2022-05-11",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/crearUsuario",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"crearUsuario"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "e- Posibilidad de dar de alta a nuevos, suspenderlos o borrarlos. (CAMBIO DE ESTADO)",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "estado",
+											"value": "activo",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/cambiarEstado/10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"cambiarEstado",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "e- Posibilidad de dar de alta a nuevos, suspenderlos o borrarlos. (MODIFICACION)",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "nombre",
+											"value": "Jose",
+											"type": "text"
+										},
+										{
+											"key": "apellido",
+											"value": "López",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "octaviovillegas@gmail.com\n",
+											"type": "text"
+										},
+										{
+											"key": "tipo",
+											"value": "empleado",
+											"type": "text"
+										},
+										{
+											"key": "rol",
+											"value": "bartender",
+											"type": "text"
+										},
+										{
+											"key": "clave",
+											"value": "123456",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/modificarUno/6",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"modificarUno",
+										"6"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "e- Posibilidad de dar de alta a nuevos, suspenderlos o borrarlos (BAJA FISICA)",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/borrarUno/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"borrarUno",
+										"5"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "8-Pedidos",
+					"item": [
+						{
+							"name": "a- Lo que más se vendió.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/masVendidos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"masVendidos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "b- Lo que menos se vendió.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/menosVendidos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"menosVendidos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "c- Los que no se entregaron en el tiempo estipulado.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/noEntregadosATiempo",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"noEntregadosATiempo"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "d- Los cancelados.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/traerPedidosPorEstado/cancelado",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"traerPedidosPorEstado",
+										"cancelado"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "9-Mesas",
+					"item": [
+						{
+							"name": "a- La más usada.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/masUsada",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"masUsada"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "b- La menos usada.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/menosUsada",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"menosUsada"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "c- La que más facturó.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-09-18",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/mayorRecaudacion",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"mayorRecaudacion"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "d- La que menos facturó.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-10-12",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/menorRecaudacion",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"menorRecaudacion"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "e- La/s que tuvo la factura con el mayor importe.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-10-12",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/facturaMayor",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"facturaMayor"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "f- La/s que tuvo la factura con el menor importe.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-10-12",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-22",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/facturaMenor",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"facturaMenor"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "g- Lo que facturó entre dos fechas dadas.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-10-09",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-19",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/facturaEntreDosFechas/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"facturaEntreDosFechas",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "h- Mejores comentarios (POR MESA)",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/mejoresComentarios/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"mejoresComentarios",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "h- Mejores comentarios (TODAS LAS MESAS)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/opiniones/mejoresComentarios/notaMesa",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"opiniones",
+										"mejoresComentarios",
+										"notaMesa"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "i- Peores comentarios (POR MESA)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/mesas/peoresComentarios/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"peoresComentarios",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "i- Peores comentarios (TODAS LAS MESAS)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/opiniones/peoresComentarios/notaMesa",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"opiniones",
+										"peoresComentarios",
+										"notaMesa"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"postman.setEnvironmentVariable(\"token\",  JSON.parse(responseBody).token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "octaviovillegas@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "1234",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:666/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Manejo PDF",
+			"item": [
+				{
+					"name": "7-Usuarios",
+					"item": [
+						{
+							"name": "7-a- Los días y horarios que se ingresaron al sistema.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/horariosLogin",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"horariosLogin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "7-a- Los días y horarios que se ingresaron al sistema (Por usuario).",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/horariosLogin/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"horariosLogin",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "7-b- Cantidad de operaciones de todos por sector.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesSector/todos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesSector",
+										"todos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "7-c- Cantidad de operaciones de todos por sector, listada por cada empleado.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesPorEmpleado/todos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesPorEmpleado",
+										"todos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "7-d- Cantidad de operaciones de cada uno por separado.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/usuarios/logOperacionesId/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"usuarios",
+										"logOperacionesId",
+										"5"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "8-Pedidos",
+					"item": [
+						{
+							"name": "8-a- Lo que más se vendió.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/masVendidos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"masVendidos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "8-b- Lo que menos se vendió.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/menosVendidos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"menosVendidos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "8-c- Los que no se entregaron en el tiempo estipulado.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/noEntregadosATiempo",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"noEntregadosATiempo"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "8-d- Los cancelados.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/pedidos/traerPedidosPorEstado/cancelado",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"pedidos",
+										"traerPedidosPorEstado",
+										"cancelado"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "9-Mesas",
+					"item": [
+						{
+							"name": "9-a- La más usada.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/masUsada",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"masUsada"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-b- La menos usada.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/menosUsada",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"menosUsada"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-c- La que más facturó.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/mayorRecaudacion",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"mayorRecaudacion"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-d- La que menos facturó.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/menorRecaudacion",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"menorRecaudacion"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-e- La/s que tuvo la factura con el mayor importe.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/facturaMayor",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"facturaMayor"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-f- La/s que tuvo la factura con el menor importe.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/facturaMenor",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"facturaMenor"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-g- Lo que facturó entre dos fechas dadas.",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "fechaInicio",
+											"value": "2022-10-09",
+											"type": "text"
+										},
+										{
+											"key": "fechaFinal",
+											"value": "2022-10-19",
+											"type": "text"
+										},
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/facturaEntreDosFechas/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"facturaEntreDosFechas",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-h- Mejores comentarios (POR MESA)",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/mejoresComentarios/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"mejoresComentarios",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-h- Mejores comentarios (TODAS LAS MESAS)",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/opiniones/mejoresComentarios/notaMesa",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"opiniones",
+										"mejoresComentarios",
+										"notaMesa"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-i- Peores comentarios (POR MESA)",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "descarga",
+											"value": "pdf",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:666/mesas/peoresComentarios/0GI28",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"mesas",
+										"peoresComentarios",
+										"0GI28"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "9-i- Peores comentarios (TODAS LAS MESAS)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:666/opiniones/peoresComentarios/notaMesa",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "666",
+									"path": [
+										"opiniones",
+										"peoresComentarios",
+										"notaMesa"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

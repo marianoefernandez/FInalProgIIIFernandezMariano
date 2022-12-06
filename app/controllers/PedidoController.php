@@ -296,7 +296,7 @@ class PedidoController extends Pedido implements IApiUsable
           $payload = "<h2>No hay productos para el estado $filtro<h2>";
         }
         $payload .= "<h3>Mostre todos los productos en estado $filtro que el usuario $usuarioLoguado->nombre $usuarioLoguado->apellido  puede ver<h3>";
-        Logs::AgregarLogOperacion($usuarioLogueado,"Pidio todos los productos con sus pedidos en estado $filtro ");
+        Logs::AgregarLogOperacion($usuarioLoguado,"Pidio todos los productos con sus pedidos en estado $filtro ");
 
       }
 
@@ -327,21 +327,30 @@ class PedidoController extends Pedido implements IApiUsable
 
       if($mesa != false && $pedido != false)
       {
-        switch(Pedido::ServirPedido($listaPedidos,$listaMesas,$pedido,$mesa))
+        $payload = json_encode(array("mensaje" => "La mesa no corresponde con el pedido"));
+
+        if($mesa->GetCodigo() == $pedido->GetCodigoMesa())
         {
-          case -1:
-            $payload = json_encode(array("mensaje" => "No hay pedidos terminados asignados al mozo"));
-            break;
+          switch(Pedido::ServirPedido($listaPedidos,$listaMesas,$pedido,$mesa))
+          {
+            case -1:
+              $payload = json_encode(array("mensaje" => "No hay pedidos terminados asignados al mozo"));
+              break;
+  
+            case 0:
+              $payload = json_encode(array("mensaje" => "La mesa está cerrada o el pedido seleccionado no está terminado o no pertenece al mozo"));
+              break;
 
-          case 0:
-            $payload = json_encode(array("mensaje" => "La mesa está cerrada o el pedido seleccionado no está terminado o no pertenece al mozo"));
-            break;
-
-          case 1:
-            $payload = json_encode(array("mensaje" => "Pedido servido con éxito"));
-            Logs::AgregarLogOperacion($usuarioLogueado,"Sirvio exitosamente el pedido con el codigo $pedido->codigo");
-            $estados = 201;
-            break;
+            case 1:
+              $payload = json_encode(array("mensaje" => "El pedido ya fue ENTREGADO"));
+              break;
+  
+            case 2:
+              $payload = json_encode(array("mensaje" => "Pedido servido con éxito"));
+              Logs::AgregarLogOperacion($usuarioLogueado,"Sirvio exitosamente el pedido con el codigo $pedido->codigo");
+              $estados = 201;
+              break;
+          }
         }
       }
 
@@ -579,13 +588,13 @@ class PedidoController extends Pedido implements IApiUsable
             {  
               $payload = json_encode(array("mensaje" => "No se modifico porque el usuario no tiene acceso a ese producto. Usted esta logueado como $usuarioLoguado->rol y deberia ser $producto->rol"));          
 
-              if(($producto->GetRol() == $usuarioLoguado->GetRol() || ($producto->GetEstado() == TERMINADO && $usuarioLoguado->GetRol() == "mozo")) || $usuarioLoguado->GetTipo() == "socio")
+              if(($producto->GetRol() == $usuarioLoguado->GetRol()) || $usuarioLoguado->GetTipo() == "socio")
               {
                 $payload = json_encode(array("mensaje" => "El producto ya está entregado"));          
 
                 if($estadoInt != ENTREGADO || $usuarioLoguado->GetTipo() == "socio")
                 {
-                  $payload = json_encode(array("mensaje" => "No puede asignarle al producto el estado $estado porque ya lo tiene asignado"));          
+                  $payload = json_encode(array("mensaje" => "No puede asignarle al producto el estado $estado porque ya lo tiene asignado o el producto no existe en el pedido"));          
 
                   if(Producto::CambiarEstadoProductoPedido($pedido,$producto,$estadoInt,$tiempoDePreparacion))
                   {

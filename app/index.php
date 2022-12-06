@@ -146,7 +146,7 @@ $app->group('/mesas', function (RouteCollectorProxy $group)
     });
 
     $group->post('/crearMesa',\MesaController::class . ':CargarUno')->add(new MWVerificar("empleado","mozo"));
-    $group->get('/listarMesas',\MesaController::class . ':TraerTodos')->add(new MWVerificar("empleado","mozo"));
+    $group->get('/listarMesas',\MesaController::class . ':TraerTodos')->add(new MWVerificar("socio","todos"));
     $group->get('/listarUna/{codigoMesa}',\MesaController::class . ':TraerUno')->add(new MWVerificar("empleado","mozo"));
     $group->delete('/borrarUna/{codigoMesa}',\MesaController::class . ':BorrarUno')->add(new MWVerificar("socio","todos"));
     $group->put('/modificarUna',\MesaController::class . ':ModificarUno')->add(new MWVerificar("empleado","mozo"));

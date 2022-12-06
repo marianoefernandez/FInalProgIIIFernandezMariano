@@ -138,6 +138,8 @@ class LogOperacionesController extends Logs
         $payload = json_encode(array("mensaje" => "La fecha tiene un formato invalido"));
         if($formatoFecha)
         {
+          $payload = "";
+          
           if($rol == "todos")
           {
             $payload = "";

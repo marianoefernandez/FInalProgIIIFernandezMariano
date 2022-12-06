@@ -682,13 +682,15 @@ class Mesa
 		$retorno=array();
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta
-		("SELECT m.codigo,m.estado,m.fechaDeCreacion, SUM(pp.precio) FROM mesas m LEFT JOIN pedidos p ON p.codigoMesa = m.codigo LEFT JOIN pedprod pp ON p.codigo = pp.codigoPedido AND p.estado = 2;
+		("SELECT m.codigo,m.estado,m.fechaDeCreacion, SUM(pp.precio) FROM mesas m LEFT JOIN pedidos p ON p.codigoMesa = m.codigo LEFT JOIN pedprod pp ON p.codigo = pp.codigoPedido AND p.estado = 2
 		GROUP BY m.codigo
 		ORDER BY SUM(pp.precio) $condicion;");
+
        	if($consulta->execute())
 		{
 			$retorno = $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
 	   	}
+
         return $retorno;
     }
 
