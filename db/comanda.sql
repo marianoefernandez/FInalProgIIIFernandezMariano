@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-11-2022 a las 06:53:37
+-- Tiempo de generación: 06-12-2022 a las 19:32:04
 -- Versión del servidor: 10.4.24-MariaDB
 -- Versión de PHP: 8.1.4
 
@@ -43,9 +43,10 @@ CREATE TABLE `calificaciones` (
 --
 
 INSERT INTO `calificaciones` (`id`, `codigoMesa`, `codigoPedido`, `notaMesa`, `notaRestaurante`, `notaMozo`, `notaCocinero`, `comentario`) VALUES
-(1, '0GI28', '7TQQL', 8, 7, 7, 7, 'Comida abundante y buena relación precio-calidad'),
 (2, '0GI28', '8SR61', 4, 3, 2, 5, 'La comida no es la gran cosa, tardo mucho el mozo, me llego frío y la mesa estaba sucia. No recomendado'),
-(6, 'ATI38', '9JJE4', 7, 8, 9, 9, 'Muy rico todo!');
+(6, 'ATI38', '9JJE4', 7, 8, 9, 9, 'Muy rico todo!'),
+(14, 'ATI38', 'EPATG', 7, 8, 9, 9, 'Muy rico todo!'),
+(15, 'D7YSX', 'MR9JG', 9, 9, 9, 9, 'Hermoso');
 
 -- --------------------------------------------------------
 
@@ -65,7 +66,8 @@ CREATE TABLE `fotospedidos` (
 --
 
 INSERT INTO `fotospedidos` (`id`, `codigoPedido`, `origen`, `destino`) VALUES
-(30, '8SR61', 'C:xampp	mpphp46F2.tmp', 'ImagenesPedidos/0GI28/');
+(41, '8SR61', 'C:xampp	mpphp9167.tmp', 'ImagenesPedidos/0GI28/'),
+(42, 'MR9JG', 'C:xampp	mpphpB750.tmp', 'ImagenesPedidos/D7YSX/');
 
 -- --------------------------------------------------------
 
@@ -188,7 +190,25 @@ INSERT INTO `loglogin` (`id`, `idUsuario`, `fechaLogin`) VALUES
 (105, 5, '2022-11-17 13:46:12'),
 (106, 5, '2022-11-25 22:09:04'),
 (107, 5, '2022-11-27 00:39:07'),
-(108, 5, '2022-11-28 01:01:11');
+(108, 5, '2022-11-28 01:01:11'),
+(109, 5, '2022-11-30 00:26:08'),
+(110, 5, '2022-12-04 04:42:31'),
+(111, 5, '2022-12-05 04:43:39'),
+(112, 11, '2022-12-06 00:10:16'),
+(113, 5, '2022-12-06 00:27:08'),
+(114, 67, '2022-12-06 00:27:24'),
+(115, 10, '2022-12-06 00:37:35'),
+(116, 12, '2022-12-06 00:38:26'),
+(117, 5, '2022-12-06 01:18:42'),
+(118, 11, '2022-12-06 01:21:58'),
+(119, 12, '2022-12-06 01:22:14'),
+(120, 67, '2022-12-06 01:23:10'),
+(121, 10, '2022-12-06 01:24:27'),
+(122, 5, '2022-12-06 01:27:20'),
+(123, 67, '2022-12-06 01:27:28'),
+(124, 10, '2022-12-06 01:28:02'),
+(125, 11, '2022-12-06 01:29:02'),
+(126, 5, '2022-12-06 01:37:07');
 
 -- --------------------------------------------------------
 
@@ -871,7 +891,166 @@ INSERT INTO `logoperaciones` (`id`, `idUsuario`, `operacion`, `fechaOperacion`) 
 (662, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas barata', '2022-11-27 00:52:56'),
 (663, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-11-27 00:54:58'),
 (664, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-11-27 00:55:18'),
-(665, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-11-28 01:01:15');
+(665, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-11-28 01:01:15'),
+(666, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios mejor valorados de la mesa con codigo 0GI28', '2022-11-30 02:53:21'),
+(667, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas alta de notaMesa', '2022-11-30 02:53:30'),
+(668, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas alta de notaMesa', '2022-11-30 03:19:23'),
+(669, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas alta de notaMesa', '2022-11-30 03:20:19'),
+(670, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com dio de alta la mesa con codigo CQEQU', '2022-12-04 05:12:33'),
+(671, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio información sobre la mesa con codigo 0GI28', '2022-12-04 05:14:49'),
+(672, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio información sobre la mesa con codigo 0GI28', '2022-12-04 05:15:05'),
+(673, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre todas las mesas', '2022-12-04 05:15:11'),
+(674, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-12-04 05:15:25'),
+(675, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-12-04 05:15:38'),
+(676, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-12-04 05:15:54'),
+(677, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas menos usadas', '2022-12-04 05:16:29'),
+(678, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas menos usadas', '2022-12-04 05:16:37'),
+(679, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas dinero recaudaron', '2022-12-04 05:22:15'),
+(680, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas dinero recaudaron', '2022-12-04 05:22:25'),
+(681, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-04 05:22:35'),
+(682, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-04 05:24:22'),
+(683, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-04 05:24:40'),
+(684, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas dinero recaudaron', '2022-12-04 05:24:48'),
+(685, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas dinero recaudaron', '2022-12-04 05:25:07'),
+(686, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas dinero recaudaron', '2022-12-04 05:25:12'),
+(687, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas dinero recaudaron', '2022-12-04 05:25:16'),
+(688, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-04 05:25:35'),
+(689, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas barata', '2022-12-04 05:25:39'),
+(690, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-04 05:26:02'),
+(691, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-12-04 05:26:14'),
+(692, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-12-04 05:26:20'),
+(693, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-12-04 05:26:28'),
+(694, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-04 05:26:33'),
+(695, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas barata', '2022-12-04 05:26:51'),
+(696, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-12-04 05:27:04'),
+(697, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-12-09 y 2022-12-19', '2022-12-04 05:27:16'),
+(698, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-12-04 05:27:37'),
+(699, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-04 05:28:04'),
+(700, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-04 05:28:12'),
+(701, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-12-04 05:28:19'),
+(702, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a cerrada ', '2022-12-04 05:49:57'),
+(703, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a comiendo ', '2022-12-04 05:50:21'),
+(704, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a comiendoa ', '2022-12-04 05:50:29'),
+(705, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a cerrada ', '2022-12-04 05:50:49'),
+(706, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a comiendo ', '2022-12-04 05:52:00'),
+(707, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a pagando ', '2022-12-04 05:52:51'),
+(708, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a cerrada ', '2022-12-04 05:53:03'),
+(709, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios mejor valorados de la mesa con codigo 0GI28', '2022-12-04 22:02:11'),
+(710, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios mejor valorados de la mesa con codigo 0GI28', '2022-12-04 22:02:38'),
+(711, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas alta de notaMesa', '2022-12-04 22:02:45'),
+(712, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas alta de notaMesa', '2022-12-04 22:03:19'),
+(713, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios peor valorados de la mesa con codigo 0GI28', '2022-12-04 22:03:23'),
+(714, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios peor valorados de la mesa con codigo 0GI28', '2022-12-04 22:03:38'),
+(715, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas baja de notaMesa', '2022-12-04 22:03:50'),
+(716, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas baja de notaMesa', '2022-12-04 22:04:01'),
+(717, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo N0BHO para la mesa XVMMN', '2022-12-05 04:15:16'),
+(718, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo YS1V1 para la mesa XVMMN', '2022-12-05 04:17:40'),
+(719, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo RJ4WU para la mesa XVMMN', '2022-12-05 04:18:51'),
+(720, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo C6LZE para la mesa XVMMN', '2022-12-05 04:19:39'),
+(721, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo 1CPRZ para la mesa XVMMN', '2022-12-05 04:21:04'),
+(722, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo H4IFN para la mesa XVMMN', '2022-12-05 04:21:50'),
+(723, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo Z41NB para la mesa XVMMN', '2022-12-05 04:29:26'),
+(724, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo CCL2L para la mesa XVMMN', '2022-12-05 04:33:06'),
+(725, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com creo un nuevo pedido con el codigo 4EGCZ para la mesa XVMMN', '2022-12-05 04:34:40'),
+(726, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com cargo un producto Milanesa con Papas al pedido con codigo EPATG para la mesa ATI38', '2022-12-05 04:36:49'),
+(727, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:39:17'),
+(728, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:40:38'),
+(729, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:43:42'),
+(730, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:43:45'),
+(731, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:43:46'),
+(732, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:54:00'),
+(733, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:58:51'),
+(734, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:58:54'),
+(735, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 04:59:18'),
+(736, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 05:00:28'),
+(737, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com saco una foto de la mesa con codigo 0GI28 para el pedido 8SR61', '2022-12-05 05:02:21'),
+(738, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los productos mas vendidos', '2022-12-05 05:02:32'),
+(739, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los productos mas vendidos', '2022-12-05 05:02:51'),
+(740, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los productos mas vendidos', '2022-12-05 05:03:10'),
+(741, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los productos menos vendidos', '2022-12-05 05:03:14'),
+(742, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los productos menos vendidos', '2022-12-05 05:03:21'),
+(743, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los pedidos no entregados a tiempo', '2022-12-05 05:03:34'),
+(744, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com creo un nuevo pedido con el codigo MR9JG para la mesa D7YSX', '2022-12-06 00:10:21'),
+(745, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com cargo un producto milanesa a caballo al pedido con codigo MR9JG para la mesa D7YSX', '2022-12-06 00:13:59'),
+(746, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com cargo un producto milanesa a caballo al pedido con codigo MR9JG para la mesa D7YSX', '2022-12-06 00:14:03'),
+(747, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com cargo un producto corona al pedido con codigo MR9JG para la mesa D7YSX', '2022-12-06 00:14:06'),
+(748, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com cargo un producto Daikiri al pedido con codigo MR9JG para la mesa D7YSX', '2022-12-06 00:14:09'),
+(749, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com saco una foto de la mesa con codigo D7YSX para el pedido MR9JG', '2022-12-06 00:15:00'),
+(750, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:16:37'),
+(751, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com dio de alta un nuevo usuario llamado Pablo Lopez con email pablolopez@gmail.com', '2022-12-06 00:27:10'),
+(752, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:27:34'),
+(753, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:27:59'),
+(754, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:28:01'),
+(755, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:28:03'),
+(756, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:28:58'),
+(757, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com modifico el estado del producto con id 5 perteneciente al pedido con codigo MR9JG a enpreparacion', '2022-12-06 00:36:06'),
+(758, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:36:49'),
+(759, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com modifico el estado del producto con id 6 perteneciente al pedido con codigo MR9JG a enpreparacion', '2022-12-06 00:36:59'),
+(760, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:37:04'),
+(761, 10, 'El empleado bartender Eros Gonzalez con mail erosgonzalez66@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:37:42'),
+(762, 10, 'El empleado bartender Eros Gonzalez con mail erosgonzalez66@gmail.com modifico el estado del producto con id 8 perteneciente al pedido con codigo MR9JG a enpreparacion', '2022-12-06 00:37:54'),
+(763, 12, 'El empleado cervecero Jose Lopez con mail josesito@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:38:32'),
+(764, 12, 'El empleado cervecero Jose Lopez con mail josesito@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:45:55'),
+(765, 12, 'El empleado cervecero Jose Lopez con mail josesito@gmail.com modifico el estado del producto con id 7 perteneciente al pedido con codigo MR9JG a enpreparacion', '2022-12-06 00:46:26'),
+(766, 12, 'El empleado cervecero Jose Lopez con mail josesito@gmail.com Pidio todos los productos con sus pedidos en estado pendiente ', '2022-12-06 00:46:29'),
+(767, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com trajo los productos de todos los pedidos en estado entregado', '2022-12-06 01:20:04'),
+(768, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com trajo los productos de todos los pedidos en estado pendiente', '2022-12-06 01:20:46'),
+(769, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com trajo los productos de todos los pedidos en estado pendiente', '2022-12-06 01:20:55'),
+(770, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com trajo los productos de todos los pedidos en estado enpreparacion', '2022-12-06 01:21:01'),
+(771, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com trajo los productos de todos los pedidos en estado enpreparacion', '2022-12-06 01:21:51'),
+(772, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com Pidio todos los productos con sus pedidos en estado enpreparacion ', '2022-12-06 01:22:00'),
+(773, 12, 'El empleado cervecero Jose Lopez con mail josesito@gmail.com Pidio todos los productos con sus pedidos en estado enpreparacion ', '2022-12-06 01:22:20'),
+(774, 12, 'El empleado cervecero Jose Lopez con mail josesito@gmail.com modifico el estado del producto con id 7 perteneciente al pedido con codigo MR9JG a terminado', '2022-12-06 01:22:40'),
+(775, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado enpreparacion ', '2022-12-06 01:23:17'),
+(776, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com modifico el estado del producto con id 5 perteneciente al pedido con codigo MR9JG a terminado', '2022-12-06 01:23:22'),
+(777, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado enpreparacion ', '2022-12-06 01:23:25'),
+(778, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com modifico el estado del producto con id 6 perteneciente al pedido con codigo MR9JG a terminado', '2022-12-06 01:23:32'),
+(779, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado enpreparacion ', '2022-12-06 01:23:35'),
+(780, 10, 'El empleado bartender Eros Gonzalez con mail erosgonzalez66@gmail.com Pidio todos los productos con sus pedidos en estado enpreparacion ', '2022-12-06 01:24:34'),
+(781, 67, 'El empleado cocinero Pablo Lopez con mail pablolopez@gmail.com Pidio todos los productos con sus pedidos en estado enpreparacion ', '2022-12-06 01:27:34'),
+(782, 10, 'El empleado bartender Eros Gonzalez con mail erosgonzalez66@gmail.com modifico el estado del producto con id 8 perteneciente al pedido con codigo MR9JG a terminado', '2022-12-06 01:28:20'),
+(783, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com trajo los pedidos listos para servir de su propiedad', '2022-12-06 01:29:06'),
+(784, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com trajo los pedidos listos para servir de su propiedad', '2022-12-06 01:30:04'),
+(785, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com Sirvio exitosamente el pedido con el codigo MR9JG', '2022-12-06 01:30:23'),
+(786, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com Sirvio exitosamente el pedido con el codigo MR9JG', '2022-12-06 01:32:49'),
+(787, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com Sirvio exitosamente el pedido con el codigo MR9JG', '2022-12-06 01:32:53'),
+(788, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com Sirvio exitosamente el pedido con el codigo MR9JG', '2022-12-06 01:33:33'),
+(789, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com Sirvio exitosamente el pedido con el codigo MR9JG', '2022-12-06 01:35:25'),
+(790, 11, 'El empleado mozo Maria Gimenez con mail mariagimenez12@gmail.com pidio informacion sobre todas las mesas', '2022-12-06 01:35:37'),
+(791, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre todas las mesas', '2022-12-06 01:37:11'),
+(792, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a pagando ', '2022-12-06 01:38:22'),
+(793, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com modifico el estado de la mesa con codigo 0GI28 a cerrada ', '2022-12-06 01:38:40'),
+(794, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas alta de notaMesa', '2022-12-06 01:50:29'),
+(795, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-12-06 01:50:38'),
+(796, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los pedidos no entregados a tiempo', '2022-12-06 01:50:51'),
+(797, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los pedidos no entregados a tiempo', '2022-12-06 01:51:02'),
+(798, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre todos los productos ordenados por cantidad de ventas', '2022-12-06 02:12:02'),
+(799, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre todos los productos ordenados por cantidad de ventas', '2022-12-06 02:12:15'),
+(800, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas ordenadas por recaudacion', '2022-12-06 02:14:42'),
+(801, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas ordenadas por recaudacion', '2022-12-06 02:15:14'),
+(802, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas ordenadas por recaudacion', '2022-12-06 02:19:35'),
+(803, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas ordenadas por recaudacion', '2022-12-06 02:19:45'),
+(804, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas ordenadas por recaudacion', '2022-12-06 02:23:51'),
+(805, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas ordenadas por recaudacion', '2022-12-06 02:24:03'),
+(806, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas ordenadas por recaudacion', '2022-12-06 02:24:09'),
+(807, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-12-06 02:24:15'),
+(808, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-12-06 02:24:24'),
+(809, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-12-06 02:24:39'),
+(810, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los productos mas vendidos', '2022-12-06 02:25:38'),
+(811, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los productos menos vendidos', '2022-12-06 02:25:41'),
+(812, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los productos menos vendidos', '2022-12-06 02:34:34'),
+(813, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre el/los pedidos no entregados a tiempo', '2022-12-06 02:34:41'),
+(814, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas usadas', '2022-12-06 02:35:03'),
+(815, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas menos usadas', '2022-12-06 02:35:07'),
+(816, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas dinero recaudaron', '2022-12-06 02:35:13'),
+(817, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas mas dinero recaudaron', '2022-12-06 02:35:19'),
+(818, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas cara', '2022-12-06 02:35:24'),
+(819, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre la/las mesas que emitieron la factura mas barata', '2022-12-06 02:35:29'),
+(820, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio la facturación de la mesa con codigo 0GI28 entre las fechas 2022-10-09 y 2022-10-19', '2022-12-06 02:35:36'),
+(821, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios mejor valorados de la mesa con codigo 0GI28', '2022-12-06 02:35:41'),
+(822, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas alta de notaMesa', '2022-12-06 02:35:51'),
+(823, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios peor valorados de la mesa con codigo 0GI28', '2022-12-06 02:35:57'),
+(824, 5, 'El socio Octavio Villegas con mail octaviovillegas@gmail.com pidio informacion sobre los comentarios con la nota mas baja de notaMesa', '2022-12-06 02:36:03');
 
 -- --------------------------------------------------------
 
@@ -890,15 +1069,15 @@ CREATE TABLE `mesas` (
 --
 
 INSERT INTO `mesas` (`codigo`, `estado`, `fechaDeCreacion`) VALUES
-('0GI28', 1, '2022-09-02'),
+('0GI28', -1, '2022-09-02'),
 ('9I4HG', -1, '2022-11-05'),
 ('A622M', -1, '2022-11-22'),
 ('AA28N', -1, '2022-11-15'),
 ('ATI38', -1, '2022-10-15'),
 ('D5A92', 1, '2022-11-02'),
-('D7YSX', -1, '2022-10-15'),
+('D7YSX', 1, '2022-10-15'),
 ('ISZH7', -1, '2022-10-15'),
-('XVMMN', -1, '2022-10-15');
+('XVMMN', 0, '2022-10-15');
 
 -- --------------------------------------------------------
 
@@ -920,10 +1099,12 @@ CREATE TABLE `pedidos` (
 --
 
 INSERT INTO `pedidos` (`codigoMesa`, `idUsuario`, `horaInicio`, `horaFinal`, `codigo`, `estado`) VALUES
+('XVMMN', 5, '2022-12-05 04:34:40', NULL, '4EGCZ', -1),
 ('0GI28', 5, '2022-10-15 22:41:40', '2022-11-11 13:10:19', '7TQQL', 2),
 ('0GI28', 5, '2022-09-23 03:18:06', '2022-09-23 03:27:21', '8SR61', 2),
 ('ATI38', 5, '2022-10-16 00:10:40', '2022-10-16 00:19:55', '9JJE4', 2),
 ('ATI38', 5, '2022-10-16 00:10:51', '2022-10-16 00:20:06', 'EPATG', 2),
+('D7YSX', 11, '2022-12-06 00:10:21', '2022-12-06 01:35:25', 'MR9JG', 2),
 ('D7YSX', 5, '2022-10-15 22:40:32', '2022-10-15 22:49:47', 'W93A8', 2);
 
 -- --------------------------------------------------------
@@ -957,7 +1138,11 @@ INSERT INTO `pedprod` (`id`, `codigoPedido`, `idProducto`, `cantidad`, `horaInic
 (14, 'W93A8', 1, 4, '2022-10-04 02:40:20', '2022-10-05 02:40:23', 2, 1399.96),
 (15, '9JJE4', 1, 5, '2022-10-12 02:40:26', '2022-10-13 02:40:30', 2, 1749.95),
 (16, '9JJE4', 3, 2, '2022-10-05 02:40:33', '2022-10-06 02:40:36', 2, 3598),
-(17, 'EPATG', 3, 3, '2022-10-06 02:40:47', '2022-10-07 02:40:53', 2, 5397);
+(17, 'EPATG', 3, 3, '2022-10-06 02:40:47', '2022-10-07 02:40:53', 2, 5397),
+(19, 'MR9JG', 5, 1, '2022-12-06 00:36:06', '2022-12-06 00:41:06', 2, 3200),
+(20, 'MR9JG', 6, 2, '2022-12-06 00:36:59', '2022-12-06 00:38:39', 2, 6400),
+(21, 'MR9JG', 7, 1, '2022-12-06 00:46:26', '2022-12-06 00:46:36', 2, 500),
+(22, 'MR9JG', 8, 1, '2022-12-06 00:37:54', '2022-12-06 00:38:04', 2, 700);
 
 -- --------------------------------------------------------
 
@@ -980,7 +1165,7 @@ CREATE TABLE `productos` (
 
 INSERT INTO `productos` (`nombre`, `tipo`, `rol`, `fechaDeCreacion`, `precio`, `id`) VALUES
 ('Cuba Libre', 'bebida', 'bartender', '2022-09-03 00:00:00', 349.99, 1),
-('Milanesa con Papas', 'comida', 'cocinero', '2022-09-04 06:32:09', 1799, 3),
+('Milanesa con Papas', 'comida', 'cocinero', '2022-12-05 03:37:21', 1899, 3),
 ('milanesa a caballo', 'comida', 'cocinero', '2022-11-05 03:31:06', 3200, 5),
 ('hamburguesa de garbanzo', 'comida', 'cocinero', '2022-11-05 03:31:37', 1600, 6),
 ('corona', 'bebida', 'cervecero', '2022-11-05 03:32:04', 500, 7),
@@ -1014,10 +1199,7 @@ INSERT INTO `usuarios` (`id`, `nombre`, `apellido`, `email`, `clave`, `tipo`, `r
 (10, 'Eros', 'Gonzalez', 'erosgonzalez66@gmail.com', '$2y$10$0cc7S8seKbvqr9NqNkdQwuhlBK49myTGo54znWfN0gj7iAMBMw3Mm', 'empleado', 'bartender', '2022-05-11', 1),
 (11, 'Maria', 'Gimenez', 'mariagimenez12@gmail.com', '$2y$10$ZTVWh2QAzoKLgE3EFAhhPeKDiZQKPZSG6FTDGWDeIUbc6HUH3TumS', 'empleado', 'mozo', '2022-05-22', 1),
 (12, 'Jose', 'Lopez', 'josesito@gmail.com', '$2y$10$jK7PXgX/uC9L7JSqHOW2p.sh55/Gquuul3UZOQUf4KKbS1XGyNHOi', 'empleado', 'cervecero', '2022-11-05', 1),
-(33, 'Juan', 'Perez', 'juanperez@gmail.com', '$2y$10$ItgDtnwnl7QIV5ZQHuMU6uqd2j1F8tJjJJc8B3ekZC4wqTn6SZ91u', 'empleado', 'mozo', '2022-11-11', 1),
-(44, 'Facundo', 'Gomez', 'facugomez@gmail.com', '$2y$10$RdaExT3P/eZ/HEOXHhrtvu7zycBVaQ8.BGpgW.oQNNSWzJwLJ03J2', 'empleado', 'bartender', '0000-00-00', 1),
-(55, 'Lionel', ' Messi', 'leomessi@gmail.com', '$2y$10$wSKbK2zWTqyRJiWC/7rZe.ML0IYMtSsWR50/RdPEnSIwc277BXhGm', 'empleado', 'cocinero', '2022-11-22', 1),
-(66, 'Diego', 'Castro', 'diegocastro@gmail.com', '$2y$10$k60PLH1b6KHhHy4TsLdZlejX1Ej1TboBI9daiA24DpxSVq6M6lKbm', 'empleado', 'cervecero', '2022-11-24', 1);
+(67, 'Pablo', 'Lopez', 'pablolopez@gmail.com', '$2y$10$/Io41yodybtDIXi0Sg9D6O9h/xaphMPXgD7rRQT4H11aZnvYRf/Cy', 'empleado', 'cocinero', '2022-12-06', 1);
 
 --
 -- Índices para tablas volcadas
@@ -1085,43 +1267,43 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `calificaciones`
 --
 ALTER TABLE `calificaciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `fotospedidos`
 --
 ALTER TABLE `fotospedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT de la tabla `loglogin`
 --
 ALTER TABLE `loglogin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
 
 --
 -- AUTO_INCREMENT de la tabla `logoperaciones`
 --
 ALTER TABLE `logoperaciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=666;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=825;
 
 --
 -- AUTO_INCREMENT de la tabla `pedprod`
 --
 ALTER TABLE `pedprod`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
